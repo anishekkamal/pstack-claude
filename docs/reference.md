@@ -4,7 +4,7 @@ Start with the [README](../README.md) for installation and your first task.
 
 ## Slash commands
 
-The package includes 54 skill directories: 31 public skills and 23 `principle-*` references. Claude Code uses `/pstack:<name>`. In Codex, request a skill by name or install the [optional shortcuts](#codex) for the `/name` form below.
+The package includes 55 skill directories: 32 public skills and 23 `principle-*` references. Claude Code uses `/pstack:<name>`. In Codex, request a skill by name or install the [optional shortcuts](#codex) for the `/name` form below.
 
 Find each skill's instructions in the [skills tree](../plugins/pstack/skills/).
 
@@ -33,6 +33,7 @@ Find each skill's instructions in the [skills tree](../plugins/pstack/skills/).
 | `/no-comments` | strip comments before review, fix the accepted findings, encode claimed constraints |
 | `/create-verification-skill` | generate a project-local verification skill and feature map |
 | `/maintain-verification-skill` | re-sync a drifted verification skill and its feature map |
+| `/verify-web` | drive the running web app over Chrome DevTools Protocol, capture evidence and perf captures, return a verdict; `control init` sets a repo up |
 | `/deslop` | deslop a diff before commit |
 | `/babysit` | monitor an open PR, fix CI/comments, keep it merge-ready |
 | `/thermo-nuclear-code-quality-review` | extremely strict maintainability audit |
@@ -75,7 +76,7 @@ Skills-only installs and other runtimes do not include the hook. Request `poteto
 Use this path for Prime Agent, opencode, Gemini CLI, or a skills-only Codex installation. Clone the repository and link its skills into `~/.agents/skills/`:
 
 ```shell
-git clone https://github.com/michael-denyer/pstack-claude
+git clone https://github.com/anishekkamal/pstack-claude
 cd pstack-claude
 mkdir -p ~/.agents/skills
 for s in plugins/pstack/skills/*/; do
@@ -97,7 +98,7 @@ To update, pull changes in the clone that the links point to. To uninstall a lin
 To install without keeping a local clone:
 
 ```shell
-npx skills add https://github.com/michael-denyer/pstack-claude/tree/main/plugins/pstack/skills --skill "*" --agent "*" --yes
+npx skills add https://github.com/anishekkamal/pstack-claude/tree/main/plugins/pstack/skills --skill "*" --agent "*" --yes
 ```
 
 The [CI installation check](../.github/workflows/ci.yml) uses the skills CLI to copy the checkout's skill tree and compare the installed files with their sources.
@@ -157,7 +158,7 @@ Those authoring workflows need `plugin-dev` for their guidance; other workflows 
 
 Playbooks use the runtime's task-tracking tools or an uncommitted `todo.md` checklist. For Claude Code, the repository documents `CLAUDE_CODE_ENABLE_TODO_TOOLS=1`; see [platform adaptation](../plugins/pstack/skills/poteto-mode/SKILL.md#platform-adaptation).
 
-Use [create-verification-skill](../plugins/pstack/skills/create-verification-skill/SKILL.md) to record how the agent should run and check your project, following the [driver policy](../plugins/pstack/skills/poteto-mode/SKILL.md#non-negotiables).
+Use [create-verification-skill](../plugins/pstack/skills/create-verification-skill/SKILL.md) to record how the agent should run and check your project, following the [driver policy](../plugins/pstack/skills/poteto-mode/SKILL.md#non-negotiables). For a web or Electron app, [verify-web](../plugins/pstack/skills/verify-web/SKILL.md) ships the harness itself: `control init` writes the project `verify` skill, and [docs/verify-web.md](verify-web.md) is the walkthrough.
 
 ## Maintenance
 

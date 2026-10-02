@@ -1,0 +1,5 @@
+# Run state and evidence are per-machine. Commit SKILL.md, verify.config.json, features/ and scripts/.
+.run/
+evidence/
+scripts/node_modules/
+scripts/package-lock.json

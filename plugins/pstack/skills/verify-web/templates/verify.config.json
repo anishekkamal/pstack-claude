@@ -1,0 +1,26 @@
+{
+  "$comment": "Per-repo harness config. Every launch flag overrides the matching field. Keys starting with $ are documentation.",
+
+  "url": "http://127.0.0.1:3000",
+  "$url": "Where the app answers once it is up. doctor checks it; launch opens it.",
+
+  "app": null,
+  "$app": "Set to start the app yourself, e.g. {\"command\": \"npm run dev\", \"cwd\": \"../../..\", \"readyTimeoutMs\": 90000}. cwd is relative to this directory (../../.. is the repo root, the default). Leave null (or pass --no-app) to drive an instance that is already running. launch refuses to start the app if url already answers.",
+
+  "cdp": null,
+  "$cdp": "Attach to a running Chromium or Electron app instead of launching one, e.g. \"http://127.0.0.1:9222\". The app must have been started with --remote-debugging-port=9222.",
+
+  "marker": null,
+  "$marker": "CSS selector that only the app under test renders, e.g. \"[data-app='myapp']\" or \"#app-root\". doctor requires it; in attach mode it picks the right page among several.",
+
+  "headed": false,
+  "channel": null,
+  "$channel": "null uses the Chromium that Playwright installs; \"chrome\" or \"msedge\" uses the browser already on the machine (no download).",
+
+  "viewport": { "width": 1280, "height": 800 },
+  "timeoutMs": 10000,
+  "$timeoutMs": "Default per-action timeout. Override per command with --timeout.",
+
+  "env": {},
+  "$env": "Extra environment for the app process and browser, e.g. {\"APP_DATA_DIR\": \"/tmp/verify-data\"} so runs never touch real user data."
+}

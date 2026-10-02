@@ -13,3 +13,7 @@
 
 # bun deps for the vendored poteto-mode scripts (bootstrap.ts installs them on first run)
 plugins/pstack/skills/poteto-mode/scripts/node_modules/
+
+# npm deps if someone installs Playwright beside the verify-web harness (control setup prefers ~/.claude/verify-web)
+plugins/pstack/skills/verify-web/scripts/node_modules/
+plugins/pstack/skills/verify-web/scripts/package-lock.json
