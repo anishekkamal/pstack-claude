@@ -23,6 +23,8 @@ If the checkout doesn't build or start as-is, fix that first (or report it preci
 
 ## 2. Generate the skill
 
+When the surface is a web UI or an Electron app, do not hand-write the harness: the plugin's `verify-web` skill ships one. Run its `scripts/control init --url <url> --app "<dev command>" --marker "<selector>"` from the repo root; it writes `.claude/skills/verify/` with the project `verify` skill, `verify.config.json`, the feature-map templates and `scripts/control` shims. Then fill the config from the interview, write the feature files, and continue at step 4. The sections below describe what a hand-written skill must carry when the surface is a CLI, an API, or something the shipped harness cannot drive.
+
 Write `.claude/skills/verify/SKILL.md` with YAML frontmatter (`name: verify` and a `description` that names the app, the surface, and when to reach for it — without frontmatter the skill never registers, and with `disable-model-invocation` the model cannot call it) and these sections, each grounded in what the interview actually found (no placeholders left):
 
 - **Launch:** the exact command that starts the app for verification, and how to tell it's ready (a log line, a port answering, a prompt). Include teardown. For a short-lived CLI or TUI there is no server to keep alive: launch means build the binary (or install deps) once, then start each drive in its own isolated PTY or tmux session.

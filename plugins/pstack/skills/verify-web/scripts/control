@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Thin shim so agents can run `scripts/control <cmd>` from the skill directory.
+exec node "$(dirname "$0")/control.mjs" "$@"

@@ -1,0 +1,12 @@
+{
+  "name": "verify-web-harness",
+  "private": true,
+  "type": "module",
+  "description": "Skill-local dependencies for the verify-web control harness. Installed here so the project's own package.json stays untouched.",
+  "scripts": {
+    "postinstall": "node -e \"console.log('verify-web: run `npx playwright install chromium` if Chromium is not installed, or set channel to chrome in verify.config.json')\""
+  },
+  "dependencies": {
+    "playwright": "^1.56.0"
+  }
+}
