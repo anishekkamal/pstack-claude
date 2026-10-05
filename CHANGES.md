@@ -2,6 +2,10 @@
 
 This file is the release changelog, with one `## <version> - <title>` entry per release, newest first. The Cursor-to-Claude rewrite rules live in [`tools/substitutions.json`](tools/substitutions.json), and the [sync boundary](CONTRIBUTING.md#the-sync-boundary) in `CONTRIBUTING.md` defines how a change to upstream's skill content is declared.
 
+## 0.10.1 - sync to the port's 0.9.72 (upstream v0.15.13)
+
+Fork release (Anishek Kamal). Merges Michael Denyer's port through 0.9.72: upstream pstack 0.15.6 to 0.15.13 (`/correct`, `/poteto-help` with its prompting and recipes references, `/benchmark-checklist`, fresh subagents by default, the hourly autopilot tick, schema-first casts, PR body headings, the `/architect` hardening) plus the port's Pi runtime, worktree-audit fixes and test tooling. The verify-web harness is unchanged; poteto-mode's driver line keeps naming it. Skill count is now 35 public skills and 24 principles.
+
 ## 0.10.0 - the verify-web harness
 
 Fork release (Anishek Kamal). The port's `/create-verification-skill` told an agent how to write a verification harness; every repo got whatever the agent improvised that day, and perf captures were re-derived each session. Lauren Tan's talk on agent trust describes the fix: a maintained CLI inside the skill plus a feature map that is the app's materialized memory. `plugins/pstack/skills/verify-web/` ships that CLI.
@@ -11,6 +15,122 @@ Fork release (Anishek Kamal). The port's `/create-verification-skill` told an ag
 Per-repo state lives at `.claude/skills/verify/`, the path poteto-mode's driver line already names: `control init` writes the project `verify` skill, `verify.config.json`, the feature-map templates and `scripts/control` shims there, and the CLI finds that directory by walking up from the working directory. `control setup` installs Playwright under `~/.claude/verify-web/` once per machine, or `--channel chrome` uses the installed browser; the harness also resolves a Playwright already in the repo or installed globally. `create-verification-skill` runs `control init` for web and Electron surfaces instead of hand-writing a harness, and `maintain-verification-skill` audits the generated map unchanged. `references/` carries the proof standards and verdict format, the perf recipes, and the trust ladder from the talk: where each agent correction belongs (architecture, static analysis, rules and skills, review), the gardener pass, and handoff levels with the evidence needed to move up. `docs/verify-web.md` is the walkthrough. The marketplace is named `pstack-anishek` so it installs beside the upstream port; the plugin name stays `pstack`.
 
 The harness was executed end to end against a sample app before release: launched and attached modes, every command, the shipped example feature file verbatim, and cleanup leaving no process behind.
+
+## 0.9.72 - sync to upstream 2cbf585 (v0.15.13)
+
+The upstream pin moves from `e43c7ee` to `2cbf585`, upstream v0.15.13, four commits. They add the `/poteto-help` skill, which maps a user's question about pstack to the skill, playbook, or principle that answers it, hands back a prompt to send, and links the file the answer came from, with a prompting reference and a recipes reference beside it. The same range also edits upstream's guide and README, which the port excludes. The package now carries 34 public skills and 24 principles.
+
+`poteto-help` is a port-feature fork, declared in `tools/forks.json`. It reads the current runtime's installation and setup instructions before giving advice, including the persistent `session hook: off` setting. Operational answers come from the installed playbooks and platform mappings, which take precedence over upstream's Cursor guides. The fork carries the port's prose adaptations so upstream wording changes go through a three-way merge. Three substitution rules remain for the public-copy base, the README link, and the recipe's project verification command. Upstream's `disable-model-invocation: true` is dropped as on every public skill, so the model can invoke the skill when a question matches its description.
+
+Measured with `bun tools/sync.mjs pstack 2cbf585`: 3 files added, 81 unchanged, 36 excluded, no merges, and no conflicts. No file became port-only.
+
+## 0.9.71 - multi-select twins, composed audit symlinks, and test tooling
+
+In Pi, a multi-select question keeps a choice selectable after the user picks another choice with the same label, so two same-label choices can both be picked. Single-select already listed each as its own choice. Picking a choice now hides only that choice, so a typed `Other` answer no longer hides a listed choice with the same text.
+
+`worktree-audit.mjs` composes the ancestor symlinks it spells a worktree through. When `/tmp` points at `/private/tmp` and `/private/tmp/link` points at `/private/tmp/real`, a session that wrote `/tmp/link/x` now counts for the worktree git lists as `/private/tmp/real/x`, which previously could be suggested as `safe`. A link that points back up to an ancestor of its own directory is still applied only through that directory's resolved spelling.
+
+A new Windows CI job runs `tests/worktree-audit.test.mjs` on `windows-latest`. The three cases that need `chmod` report as skipped there. A bare `bun test` at the repository root now runs the same files as `bun test tests/`, instead of also loading the vendored poteto-mode script tests, which failed until their own dependencies happened to be installed. `bun tools/typecheck-pi.mjs` and the Pi tests also find a bun-installed Pi under `BUN_INSTALL_GLOBAL_DIR`, `$BUN_INSTALL/install/global` and `$XDG_CACHE_HOME/.bun/install/global`.
+
+## 0.9.70 - worktree audit, hook validation, Pi runtime, and fork registry fixes
+
+`worktree-audit.mjs` finds more of the chats that touched a worktree, so fewer worktrees with a recent session are suggested as `safe`. A path now counts when a quote, whitespace, `` ` ``, `:`, `;`, `)`, `]`, `}`, `,`, `|`, `&`, `<`, `>`, a sentence-final `.`, or the end of the line follows it, so `cd /x/wt;ls`, `` `/x/wt` `` and `${WT:-/x/wt}` all count, while a sibling such as `/x/wt.bak` or `/x/wt-long` still does not. A worktree is also matched by the spelling of a symlink that sits in one of its ancestor directories and points at the worktree or another of those directories, so a session that wrote `/tmp/x` counts for the worktree git lists as `/private/tmp/x`. A spelling that cannot be resolved for a reason other than a missing directory leaves that worktree's last chat unknown, with a warning, instead of guessing. The scan searches once per spelling and checks the byte after each hit, so the wider boundary set and the extra spellings do not multiply its passes over the transcripts. The SIZE column now reads macOS `du` output, which pads short sizes with spaces. Run the script with `node`, as its shebang does. Under bun, a macOS cloud-storage link in the home directory fails to resolve.
+
+The worktree audit refreshes a transcript's timestamp after reading it. Resuming an old session during the scan now keeps its active worktree in `verify-recent-chat` instead of marking it `safe` with the old timestamp.
+
+`find-transcript.mjs` stats each transcript once, keeps searching when a transcript is removed during the walk, and refuses a Codex rollout by name instead of reporting no transcript. `worktree-audit.mjs` likewise skips a transcript removed mid-scan instead of failing the whole scan.
+
+`tools/generate.mjs` checks each hooks file against one typebox schema per hook type (`command`, `http`, `mcp_tool`, `prompt`, `agent`). A non-string `commandWindows` and a misspelt key now fault with the file's name instead of crashing or passing, an unknown or prototype-named `type` faults, and `prompt`, `agent`, `http`, and `mcp_tool` hooks are accepted. The Codex and Pi rows in `tools/runtimes.mjs` now own their manifest path and validator, and the Codex row its hooks files, so the generator no longer spells out Codex's or Pi's packaging. The generator imports typebox, so run `bun install` before it.
+
+The POSIX, PowerShell, and Pi readers of the model sheet follow one grammar: UTF-8, or UTF-16 LE behind its byte-order mark as Windows PowerShell 5.1's `>` writes it; lines end at LF; one CR before the LF is dropped. A UTF-16 sheet with `session hook: off` now turns the hook off under every runtime.
+
+In Pi, an agent's lifecycle lives in one map, and stopping an agent sends one SIGTERM and a SIGKILL after the full kill grace. Answers given before a later question is dismissed are kept. The agent effort levels come from `models.json`, and a `paths:` line that is not a JSON array of strings fails naming its skill file. The runtime lost its test-only `childEnv` setting, and the Pi typecheck works with a Pi installed only through bun.
+
+Pi children explicitly load pstack's extension and skills, so a project-local install or a parent started with `pi -e` can launch agents in fresh worktrees. The startup tests run against installed Pi without model calls, including when the package is already installed globally.
+
+A due wakeup remains pending until Pi is idle, with at most one second of additional delay. Manual compaction no longer discards the prompt and stops a self-paced loop. Cancellation, replacement, and session shutdown also clear a wakeup waiting for idle.
+
+Structured questions number their choices. A choice named `Done` or `Other (type an answer)` now stays distinct from the completion and free-text controls, and choices with identical display text remain selectable.
+
+`tools/sync.mjs` fails on a stale `tools/forks.json` entry when syncing at the pinned SHA, and CI annotates only declared forks and upstream-owned skill files. Every fork's `why` now describes its whole diff from upstream.
+
+Resume rejects a link with an error that names it and states the link rule that `resume-storage.md` documents, and ignores links inside code spans and fences. The orch store pins frontier SHAs to exact local branch refs and strips every terminal control sequence from `gt` output. poteto-mode's Subagents section gains a rule for every runtime. A required review gate stays closed when no independent reviewer can run, the todolist records `BLOCKED: independent review`, and a finished reviewer may be reused only through the runtime's follow-up action. `codex-tools.md` adds that a `spawn_agent` thread-limit error is a capacity error, not a rejected model, and that some Codex hosts lack `close_agent`. `setup-pstack` offers to generate a project verification skill again, a step upstream added with `create-verification-skill` that the 0.9.10 port missed.
+
+## 0.9.69 - hook validation names a missing command
+
+`tools/generate.mjs` reports a hook with no `command` as a fault. Since the `commandWindows` override landed in 0.9.66, such a hook passed validation with nothing checked, including one that carried only a Windows override and so ran nowhere else.
+
+## 0.9.68 - resume links with parentheses, BOM-led plans, Codex sessions in the worktree audit, and Pi fixes
+
+Resume checkpoint publication now accepts Markdown angle-bracket destinations such as `[Questions](<questions (draft).md>)`. A linked local file still has to be registered with `--artifact`. A CLI regression test covers publication and a subsequent read.
+
+`check-plan.mjs` and `check-playbooks.mjs` strip a leading UTF-8 byte-order mark, so a plan or project playbook saved by an editor that adds one no longer fails with a missing title, a missing `when:` line, or frontmatter linted as prose.
+
+`worktree-audit.mjs` scans Codex's `sessions` and `archived_sessions` under `$CODEX_HOME` (default `~/.codex`) and honours `$CLAUDE_CONFIG_DIR`, so a worktree with a recent Codex session lands in `verify-recent-chat` instead of `safe`. It matches a worktree path as JSONL spells it, which covers Windows backslash and forward-slash spellings, UNC paths, and paths with escaped characters, without matching a sibling that shares the prefix.
+
+In Pi, starting a new `/loop` cancels the previous loop's pending wakeup in both modes, so an old self-paced prompt no longer fires after a replacement. A sheet the user cannot read leaves the defaults in place instead of failing session start or an agent launch, and the shared sheet table in `tests/session-hook-sheets.mjs` now holds every hook to that case. A retained agent worktree is checked before reuse and cleanup: a plain directory, a link, an unrelated repository, or an unregistered gitdir at that path is refused, and its files are left alone, so an isolated agent can no longer run in the parent checkout.
+
+`tools/forks.json` drops the stale `watch-pr/transport.test.ts` entry that the sync dry-run warned about.
+
+## 0.9.67 - session hook sheet parity
+
+The POSIX hook, the PowerShell hook, and Pi now read the sheet the same way in two more cases. A `session hook: off` line after a UTF-8 byte-order mark counts as off, which covers sheets saved by editors that add one. A sheet that exists but cannot be read as a file leaves the hook on, the same as a missing sheet, instead of failing the PowerShell hook or printing an error from the POSIX one. Both cases join the shared table in `tests/session-hook-sheets.mjs`. The Windows CI job's test timeout drops from 60 to 10 seconds, so a return of the slow PowerShell start fails the job.
+
+## 0.9.66 - Windows Codex SessionStart hook
+
+The Codex plugin's `SessionStart` hook now runs on Windows. `codex-hooks.json` adds a `commandWindows` override that runs `session-start.ps1` through PowerShell, so Windows Codex loads the routing instruction without Bash (#171). Windows users must trust the changed hook again through `/hooks`.
+
+`session-start.sh` now treats a `session hook: off` line with CRLF endings as off, matching the PowerShell adapter and Pi. One table in `tests/session-hook-sheets.mjs` holds the off-switch cases, and the POSIX hook, the PowerShell adapter, and Pi's sheet parser all run against it. A new Windows CI job runs the adapter's tests and fails instead of skipping if they do not run.
+
+## 0.9.65 - sync to upstream e43c7ee (v0.15.9)
+
+The upstream pin moves from `23e4138` to `e43c7ee`, upstream v0.15.9, three commits. The first adds the `/correct` skill. It finds the mistakes agents keep repeating in a repo and fixes each class at the highest level that works: architecture first, then types and lint, then a test, with docs last. The package now carries 33 public skills and 24 principles.
+
+`architect` now screens candidates on the assumption that the next contributor is an agent that sees only the files it opened and copies the nearest example. `design-red-flags.md` gains four red flags: split ownership, two ways to do one task, importable internals, and a hand-synced list. The Perf issue playbook replaces its eight strategy families with seven performance mantras tried in order, cheapest first, and stops at the first one that meets the target. Hillclimb orders perf hypotheses by those mantras, and `benchmark-checklist` points at them.
+
+Measured with `bun tools/sync.mjs pstack e43c7ee`: 4 files updated clean, 1 added, 1 merged three-way (`architect/SKILL.md`), 76 unchanged, 36 excluded, and no conflicts. The new upstream text carries no Cursor-only terms, so `tools/substitutions.json` is unchanged. No file became port-only.
+
+## 0.9.64 - sync to upstream 23e4138 (v0.15.6)
+
+The upstream pin moves from `12d587d` to `23e4138`, upstream v0.15.6, one commit. It adds the `benchmark-checklist` skill and the `principle-explain-the-number` principle, which together vet a measured speedup or regression before anyone reports or acts on it. `poteto-mode` triggers `benchmark-checklist` on a benchmark and indexes the new principle, so the package now carries 32 public skills and 24 principles.
+
+Subagents are fresh by default. A fix round, a follow-up, a retry, and the next queue item go to a new agent with the consolidated brief. A resume is reserved for work that needs state living in the old agent, such as its checkout, uncommitted changes, or a running process. The autopilots hand each next queue item to a fresh owner, owners push after every verifiable unit, and the audit tick judges an owner by its pushed branch and decision trail. The audit tick runs every hour instead of every 30 minutes, and `check-plan.mjs` pins the new cadence. Opening a PR names the run's built-in PR tool first, and the playbooks gain a "Size and stacks" paragraph. Operator-facing defaults under a full-autonomy grant are reported in plain words, with no shorthand token to type back. `technical-writing` drops its fetch-date source lines, and `typescript-best-practices` takes upstream's schema-first reference edits.
+
+Measured with `bun tools/sync.mjs pstack 23e4138`: 6 files updated clean, 2 added, 1 merged three-way, 72 unchanged, 36 excluded, and 5 conflicted files resolved by hand. The conflicts are `SKILL.md`, `autopilot-full.md`, `autopilot-stack.md`, `multi-phase-plan.md`, and `check-plan.mjs`. The sync's denylist rejects the `control-cli` and `control-ui` lines that those conflicts carry, so the run excluded the five paths and the edits were applied by hand afterward.
+
+Port policy is unchanged where it diverges from upstream. The autopilots stop at merge-ready for the operator's click, so the upstream rule that skips a second rebase before the owner's own merge is not ported. The `/goal` removals already matched the port, which never armed one.
+
+## 0.9.63 - the description starts with a capital
+
+The plugin description in every manifest starts with "If" instead of "if".
+
+## 0.9.62 - no author email in the manifests
+
+The Claude and Codex plugin manifests, the marketplace, and `package.json` name the author and link to the GitHub profile, without an email address.
+
+## 0.9.61 - Pi agents learn their depth from a flag
+
+The Pi extension passed each agent it started a copy of the session's environment with `PSTACK_PI_DEPTH` added, the last place the plugin handed a copy of the whole environment to a child process. Agents now inherit the environment unchanged, and the extension registers a `--pstack-depth` flag that a parent passes to each agent it starts. An agent reads its depth from that flag. Depth limits and behaviour are unchanged.
+
+## 0.9.60 - orch and the watch-pr tests stop handing the whole environment to child processes
+
+The Claude plugin directory holds pstack with "Uses a credential from the user's machine". The orch store passed a copy of `process.env` to `gt` and `git`, and three test files passed one to the processes they start. The orch store now lets `gt` and `git` inherit the environment and strips colour codes from `gt` output, where it set `NO_COLOR` before. `openStore` takes a `gt` option, the path of the `gt` executable, which defaults to `gt`. The orch tests use it to run a fake `gt`, because Bun resolves a command that has no `env` option against the `PATH` it started with. The tests' child processes get only `PATH` and the variables each test sets. The Pi extension still passes `PSTACK_PI_DEPTH` to its child agents in a copy of the environment.
+
+The plugin folder has `.claude-plugin/icon.png`, the path the directory reads for the listing icon.
+
+## 0.9.59 - no `$PWD` in the repository and no listing fields in `plugin.json`
+
+The Claude plugin directory validator reads `$PWD` as a credential-named variable and holds a plugin when a file that names it also names a remote URL. The shared-skills and Codex prompt install loops in `docs/reference.md` link with `$(pwd)`, the CI and Security workflows mount `$GITHUB_WORKSPACE`, and the skills-only CI job installs `./plugins/pstack/skills`. Each resolves to the same path as before.
+
+The Claude `plugin.json` no longer carries `icon`, `documentationUrl`, `supportUrl`, `privacyPolicyUrl`, or `termsOfServiceUrl`. Claude Code ignores all five at load time, and the validator reports each one as a finding. `assets/pstack-icon.png` stays for the Codex manifest.
+
+## 0.9.58 - run pstack on Pi
+
+pstack now installs on [Pi](https://pi.dev) 1.0 with `pi install` and behaves on Pi as it does on Claude Code. The repository root is a Pi package that loads the shared skills tree and a Pi extension, `plugins/pstack/pi/`, which supplies what Pi lacks under the Claude Code names the skills already use. `agent` runs each subagent as a child `pi --mode rpc` process with the role's model, effort, and agent file, in the foreground or background, optionally in its own git worktree. `send_message`, `list_agents`, and `stop_agent` message, list, and stop those agents, and an agent's status follows its process, so `completed` always means it exited. A message to a running agent is an RPC `steer` on the child's stdin, which the agent reads after its current tool calls, as on Claude Code, so the agent carries on in the same run and reports once. A message to a finished agent resumes it, and a message that arrives after the agent settled resumes it once its process has exited. `ask_user_question`, `schedule_wakeup`, and `/loop` match `AskUserQuestion`, `ScheduleWakeup`, and the `loop` skill. A `schedule_wakeup` call with `noop: true` still schedules, and `stop: true` cancels the pending wakeup and needs no other field. At every agent start the extension adds the routing instruction and the override sheet to the system prompt, so both survive compaction, and `session hook: off` drops the instruction as on Claude Code. In `pi -p` runs the extension holds the run open until each background agent's notice has run as a turn, and a child agent holds its own settle the same way while its background agents run. `readonly: true` runs an agent without the `edit` and `write` tools. A background agent's notice joins the running turn after its current tool calls, as on Claude Code, so the lead sees a result before it writes its reply. Agents can start agents down to three layers below the main session, and the third layer runs without `agent`, as on Claude Code. Quitting, reloading, or switching sessions stops every running agent, a parent process that exits signals its agents to stop, and a session start stops an agent whose launching `pi` process is gone. In `pi -p`, `/loop` runs its prompt as part of the one run, and scheduling a wakeup returns an error, because the run would end before the wakeup fired. In a child agent, scheduling a wakeup and `ask_user_question` return an error for the same reason and because a child has no user to ask. While a background agent runs, a `bash` line in which any command starts with a foreground `sleep` of two seconds or more is refused with a reminder that the agent's notice arrives on its own, because models otherwise polled with `sleep` and cut agents short. The system prompt also carries Claude Code's sentence on making independent tool calls in one response, which skills that start N agents in one message rely on.
+
+Family names resolve through a new `pi` block in `models.json` to model IDs for the provider the Pi session runs on. On a ChatGPT sign-in, `fable` is GPT-6 Astra, `opus` GPT-6.1 Sol, `sonnet` GPT-6 Sol, and `haiku` GPT-6 Luna, matching the tiers of the Codex defaults. Anthropic and any other provider get the Claude models. Pi warns that Anthropic bills Claude used through Pi per token, even on a Claude subscription, so the Pi docs say so and point Claude plan users at Claude Code. A `pi models:` line in the Pi override sheet, `~/.pi/agent/pstack-models.md`, remaps any family name. `poteto-mode/references/pi-tools.md` maps each Claude tool, model, and skill reference to its Pi equivalent, and `poteto-mode/SKILL.md` points at it once, so no other skill file carries a Pi line. The extension's system prompt carries the same pointer in every session, child agents included. The generator stamps the mapping's Model names table, writes the package version, validates the package manifest, and fails when a row of the mapping's Per-skill notes table names a skill that does not exist. `reflect/scripts/find-transcript.mjs` and `worktree-audit.mjs` read Pi session files, and `worktree-audit.mjs` names every transcripts directory that is missing, not only the first. `find-transcript.mjs` also splits lines on newlines only. It read through Node's `readline`, which breaks at U+2028 and U+2029, so a prompt containing either character was skipped on Claude Code too.
+
+`docs/pi-equivalence.md` lists the 62 Claude Code mechanisms pstack depends on and how Pi provides each one, and a test fails when a row cites a test that does not exist. Offline tests drive the extension against a fake `pi`, `tests/pi/catalog.test.mjs` checks the default model IDs against the installed Pi's catalog, which CI's `Pi extension types` job runs against the pinned release, and `PSTACK_PI_LIVE=1` runs `tests/pi/live.test.mjs` against real Pi. Every row that needs a live check passed it. The root `package.json` declares `typebox` and the optional `@earendil-works/pi-coding-agent` as peer dependencies, a root `bun.lock` pins `typebox`, and the CI job that runs `bun test tests/` first runs `bun install --frozen-lockfile`.
 
 ## 0.9.57 - project playbooks on top of the bundled ones
 

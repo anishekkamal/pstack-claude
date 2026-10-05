@@ -13,6 +13,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
+import { stripVTControlCharacters } from "node:util";
 
 const UNIT_HEADER = "id\ttrack\tstate\tbranch\tpr\tsha\tbrief";
 const LEDGER_HEADER = "pr\tsha\tverdict\tevidence\tverifier\tts";
@@ -176,6 +177,7 @@ export interface AddStandingParams {
 
 export interface OpenStoreOptions {
   readonly force?: boolean;
+  readonly gt?: string;
   readonly onLockStolen?: (holder: string) => void;
   readonly onStaleLock?: (holder: string) => void;
 }
@@ -1072,19 +1074,24 @@ function parseGtBranches(raw: string): readonly string[] {
 
 function graphitePullRequest({
   branch,
+  gt,
   repo,
 }: {
   branch: string;
+  gt: string;
   repo: string;
 }): GtPullRequest {
   let raw: string;
   try {
-    raw = execFileSync("gt", ["--no-interactive", "info", branch], {
-      cwd: repo,
-      encoding: "utf8",
-      env: { ...process.env, NO_COLOR: "1" },
-      stdio: ["ignore", "pipe", "pipe"],
-    });
+    // A colour setting such as FORCE_COLOR in the user's environment must not
+    // break the gt parsers.
+    raw = stripVTControlCharacters(
+      execFileSync(gt, ["--no-interactive", "info", branch], {
+        cwd: repo,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      })
+    );
   } catch (error) {
     throw new UserError(
       `gt info ${branch} failed: ${errorMessage(error)}`
@@ -1110,18 +1117,25 @@ function graphitePullRequest({
   return parseGtPullRequest({ branch, detail: rows[0] ?? "" });
 }
 
-function graphiteFrontier(repo: string): readonly GtFrontierEntry[] {
+function graphiteFrontier({
+  gt,
+  repo,
+}: {
+  gt: string;
+  repo: string;
+}): readonly GtFrontierEntry[] {
   let raw: string;
   try {
-    raw = execFileSync(
-      "gt",
-      ["--no-interactive", "log", "short", "--stack", "--reverse"],
-      {
-        cwd: repo,
-        encoding: "utf8",
-        env: { ...process.env, NO_COLOR: "1" },
-        stdio: ["ignore", "pipe", "pipe"],
-      }
+    raw = stripVTControlCharacters(
+      execFileSync(
+        gt,
+        ["--no-interactive", "log", "short", "--stack", "--reverse"],
+        {
+          cwd: repo,
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+        }
+      )
     );
   } catch (error) {
     throw new UserError(
@@ -1130,7 +1144,7 @@ function graphiteFrontier(repo: string): readonly GtFrontierEntry[] {
   }
   const result = parseGtBranches(raw).map((branch) => ({
     branches: branch,
-    ...graphitePullRequest({ branch, repo }),
+    ...graphitePullRequest({ branch, gt, repo }),
   }));
   if (new Set(result.map((row) => row.pr)).size !== result.length) {
     throw new UserError("gt info output contains duplicate pull requests");
@@ -1147,12 +1161,15 @@ function branchSha({
 }): string {
   let raw: string;
   try {
-    raw = execFileSync("git", ["rev-parse", branch], {
-      cwd: repo,
-      encoding: "utf8",
-      env: process.env,
-      stdio: ["ignore", "pipe", "pipe"],
-    });
+    raw = execFileSync(
+      "git",
+      ["rev-parse", "--verify", `refs/heads/${branch}^{commit}`],
+      {
+        cwd: repo,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      }
+    );
   } catch (error) {
     throw new UserError(
       `git rev-parse ${branch} failed: ${errorMessage(error)}`
@@ -1165,8 +1182,14 @@ function branchSha({
   return sha;
 }
 
-function resolveFrontier(repo: string): readonly FrontierPr[] {
-  return graphiteFrontier(repo).map((row) => ({
+function resolveFrontier({
+  gt,
+  repo,
+}: {
+  gt: string;
+  repo: string;
+}): readonly FrontierPr[] {
+  return graphiteFrontier({ gt, repo }).map((row) => ({
     ...row,
     sha: branchSha({ branch: row.branches, repo }),
   }));
@@ -1499,7 +1522,7 @@ export function openStore(
           throw new UserError("--prs must not contain duplicates");
         }
         const old = await readFrontier(store);
-        const prs = resolveFrontier(repo);
+        const prs = resolveFrontier({ gt: options.gt ?? "gt", repo });
         if (pin !== undefined) {
           validateFrontierPin({
             actual: prs.map((row) => row.pr),

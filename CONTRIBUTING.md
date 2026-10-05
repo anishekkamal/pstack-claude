@@ -27,20 +27,23 @@ bun tools/sync.mjs pstack <new-upstream-sha>
 
 `--dry-run` reports without writing. Passing the pinned SHA itself under `--dry-run` prints the ownership map. Every file under the forked count is one the port has forked, nothing is written or conflicted, and everything else syncs clean. Each forked file prints with its changed lines against the derived upstream text, largest first, above a total, and a fork that differs only in file mode prints `mode`. The `port-only` list names every file under the component's local path that no component carries upstream at its pin, excluded paths aside.
 
-`tools/forks.json` declares every fork under its component, keyed by repo-relative path. Each entry has a `kind` (`port-feature` or `policy`), a one-sentence `why` naming the mechanism, the `since` release the fork first shipped in, and an `upstream` status: `not-proposed`, or the URL of the upstream PR or issue. The ownership map prints each fork's kind beside its count. A forked, merged, or conflicted path with no entry fails the run, dry runs included, and a real run then writes nothing. Add the entry in the PR that forks the file. Delete an entry when the sync warns that its path is no longer forked or no longer exists; the warning does not fail the run.
+`tools/forks.json` declares every fork under its component, keyed by repo-relative path. Each entry has a `kind` (`port-feature` or `policy`), a one-sentence `why` naming the mechanism, the `since` release the fork first shipped in, and an `upstream` status: `not-proposed`, or the URL of the upstream PR or issue. The ownership map prints each fork's kind beside its count. A forked, merged, or conflicted path with no entry fails the run, dry runs included, and a real run then writes nothing. Add the entry in the PR that forks the file. An entry whose path is not forked or no longer exists fails a run at the pinned SHA, which is the CI check, and the run writes nothing. On a sync to a new SHA the same entry only warns, because upstream absorbed the fork in that run; delete the entry in the sync's PR.
 
 When a clean merge matches the new upstream text and mode, the sync reports it as `updated`. Any existing fork declaration becomes stale in that same run, and removing the declaration does not block the update. A surviving port mode change still counts as a fork even when the text matches upstream.
 
 ## Before you open a PR
 
-Run the generator and the tests:
+Install the root dependencies, then run the generator and the tests:
 
 ```shell
+bun install --frozen-lockfile
 bun tools/generate.mjs
 bun test tests/
 ```
 
-The generator writes `VERSION` into all three plugin manifests and stamps model defaults from `plugins/pstack/models.json`. It also owns one line under the first heading of some files: the Codex preamble on each skill with a row in the Per-skill notes table of `skills/poteto-mode/references/codex-tools.md`, and the driver-skill line on the playbooks in `DRIVER_PLAYBOOKS`. Either line anywhere else fails the generator, so a skill gets the preamble by gaining a notes row. It validates each skill's `name` and `description`, then generates a Codex prompt for each public skill using the [slash-command table](docs/reference.md#slash-commands).
+The root `package.json` declares `typebox` and the optional `@earendil-works/pi-coding-agent` as peer dependencies, because Pi provides both to an extension at runtime. The root `bun.lock` pins `typebox` for the generator, which checks hook files against it, and for the tests under `tests/pi/`, which load the extension outside Pi.
+
+The generator writes `VERSION` into all three plugin manifests and the Pi `package.json` and stamps model defaults from `plugins/pstack/models.json`. It also owns one line under the first heading of some files: the Codex preamble on each skill with a row in the Per-skill notes table of `skills/poteto-mode/references/codex-tools.md`, and the driver-skill line on the playbooks in `DRIVER_PLAYBOOKS`. Either line anywhere else fails the generator, so a skill gets the preamble by gaining a notes row. No skill file carries a Pi line: `poteto-mode/SKILL.md` points at `pi-tools.md` once, and a skill's Pi note is a row in that file. It validates each skill's `name` and `description`, then generates a Codex prompt for each public skill using the [slash-command table](docs/reference.md#slash-commands).
 
 It also copies the four files in `PORTABLE_ASSETS` into the skills-only installation and removes stale generated files. `NOTICE-skills.md` supplies the notice included with those skills.
 
@@ -55,9 +58,11 @@ CI runs `bun tools/generate.mjs --check`, which writes nothing and fails naming 
 
 When adding a skill, include `name` and `description` in its frontmatter. Public skills also need a row in the slash-command table. The row supplies the Codex menu description and ordering. The generator reports any skill missing a row or any row without a skill.
 
-Change model defaults in `models.json`, never in a skill body. A role names a tier from `tiers` (`default`, `strongest`, or `panel`), so moving a tier is one edit, and the `codex` block gives the Codex example for each tier. The generator checks the configuration's structure as it loads it (`parseModels` in `tools/generate.mjs`) and fails naming the offending role, tier, or slug. `tests/models.test.mjs` proves each malformed shape is rejected and checks that skills name every role they use. A full `claude-*` ID or a backticked available name such as `` `fable` `` outside a generated region fails the generator with its file and line.
+Change model defaults in `models.json`, never in a skill body. A role names a tier from `tiers` (`default`, `strongest`, or `panel`), so moving a tier is one edit, the `codex` block gives the Codex example for each tier, and the `pi` block maps each available family name to a Pi model ID once per Pi provider, with a `fallback` provider for sessions on any other. The generator checks the configuration's structure as it loads it (`parseModels` in `tools/generate.mjs`) and fails naming the offending role, tier, or slug. `tests/models.test.mjs` proves each malformed shape is rejected and checks that skills name every role they use. A full `claude-*` ID or a backticked available name such as `` `fable` `` outside a generated region fails the generator with its file and line.
 
 `bun test tests/` covers the generator, the sync tool, the link validator, and `tests/invariants.test.mjs`, which builds fixture trees that must trip each layout invariant. One check is behavioral and lives in `tests/skill-collision-repro.sh`: it needs the `claude` CLI and API access and makes one haiku call to prove a user-typed `/plugin:name` reaches a skill with no `commands/` present. CI cannot run it, so run it locally at least once before a release.
+
+If you touched `plugins/pstack/pi/` or `pi-tools.md`, run the Pi checks against a signed-in `pi` 1.0 as well. `bun tools/typecheck-pi.mjs` typechecks the extension under strict against the installed Pi package's own types; it uses `PI_PACKAGE_DIR` when set and otherwise looks under the global npm root, then bun's global directory (`BUN_INSTALL_GLOBAL_DIR`, then `$BUN_INSTALL/install/global`, then `$XDG_CACHE_HOME/.bun/install/global`, then `~/.bun/install/global` and `~/.cache/.bun/install/global`), as `tests/pi/catalog.test.mjs` and `tests/pi/runtime.test.mjs` do through `tools/pi-package.mjs`. CI's `Pi extension types` job installs the pinned release in the global npm root. `PSTACK_PI_LIVE=1 bun test tests/pi/live.test.mjs` drives the extension through real `pi` processes in about five minutes. It makes real model calls, on the shipped `openai` models by default. Set `PSTACK_PI_LIVE_PROVIDER=anthropic` to call the Claude models instead, or set `PSTACK_PI_LIVE_MODELS` to a `pi models:` line to replace individual models.
 
 If you touched `skills/poteto-mode/scripts/`:
 
@@ -101,7 +106,7 @@ uvx zizmor@1.29.0 --persona pedantic --min-severity low --collect all -- .
 
 ## Dependency updates
 
-Dependabot keeps the pinned action SHAs current. The vendored scripts' one runtime dependency (`commander`) follows upstream's pin and moves with `tools/sync.mjs`; `osv-scanner` scans `bun.lock` weekly, so a CVE still surfaces. If you bump it by hand, run `bun install` and commit the resulting `bun.lock` in the same change.
+Dependabot keeps the pinned action SHAs current. The vendored scripts' one runtime dependency (`commander`) follows upstream's pin and moves with `tools/sync.mjs`; `osv-scanner` scans every `bun.lock` weekly, so a CVE still surfaces. The root `bun.lock` pins `typebox`, which the generator and the Pi extension tests import. If you bump it by hand, run `bun install` and commit the resulting `bun.lock` in the same change.
 
 ## Releasing
 

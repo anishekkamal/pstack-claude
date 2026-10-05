@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join } from "node:path";
 
 import { candidates, findTranscript, openingPrompt } from "../plugins/pstack/skills/reflect/scripts/find-transcript.mjs";
+import { removeDuring } from "./remove-during.mjs";
 
 const script = join(import.meta.dir, "../plugins/pstack/skills/reflect/scripts/find-transcript.mjs");
 const noNode = spawnSync("node", ["--version"]).status !== 0;
@@ -83,7 +84,7 @@ describe("find-transcript", () => {
     const nested = transcript(dir, "n1/n1.jsonl", [meta], 300);
     const sub = transcript(dir, "n1/subagents/child.jsonl", [meta], 200);
     writeFileSync(join(dir, "notes.txt"), "not a transcript");
-    expect(candidates(dir)).toEqual([nested, sub, flat]);
+    expect(candidates(dir).map(({ path }) => path)).toEqual([nested, sub, flat]);
   });
 
   test("findTranscript returns the newest transcript whose opening prompt carries the fragment", async () => {
@@ -95,6 +96,46 @@ describe("find-transcript", () => {
     expect(await findTranscript(dir, "nothing matches this")).toBeNull();
   });
 
+  test("a transcript deleted after enumeration does not abort the scan", async () => {
+    const dir = tempDir();
+    transcript(dir, "newest.jsonl", [meta, user("unrelated prompt")], 300);
+    const removed = transcript(dir, "removed.jsonl", [meta, user("another prompt")], 200);
+    const older = transcript(dir, "older.jsonl", [meta, user("resume the audit")], 100);
+    const search = findTranscript(dir, "resume the audit");
+    // Enumeration has completed; the first streamed read yields before this candidate opens.
+    rmSync(removed);
+    expect(await search).toBe(older);
+  });
+
+  test.skipIf(noNode)(
+    "a session directory or transcript removed while the tree is listed is skipped (skipped without node)",
+    () => {
+      const dir = tempDir();
+      const kept = transcript(dir, "kept.jsonl", [meta], 100);
+      const flat = transcript(dir, "flat.jsonl", [meta], 200);
+      transcript(dir, "s1/s1.jsonl", [meta], 300);
+      const body = `const { candidates } = await import(${JSON.stringify(script)});
+        console.log(JSON.stringify(candidates(${JSON.stringify(dir)}).map(({ path }) => path)));`;
+      const run = removeDuring("readdirSync", dir, [join(dir, "s1"), flat], body);
+      expect(run.stderr).toBe("");
+      expect(JSON.parse(run.stdout)).toEqual([kept]);
+    },
+  );
+
+  test("other candidate read errors still propagate", async () => {
+    const dir = tempDir();
+    transcript(dir, "newest.jsonl", [meta, user("unrelated prompt")], 300);
+    const changed = transcript(dir, "changed.jsonl", [meta], 200);
+    const search = findTranscript(dir, "audit");
+    rmSync(changed);
+    mkdirSync(changed);
+    await expect(search).rejects.toMatchObject({ code: "EISDIR" });
+  });
+
+  test("a missing project directory still reports the filesystem error", async () => {
+    await expect(findTranscript(join(tempDir(), "missing"), "audit")).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
   test("a truncated trailing line does not abort the scan", async () => {
     const dir = tempDir();
     const live = join(dir, "live.jsonl");
@@ -103,6 +144,99 @@ describe("find-transcript", () => {
     const older = transcript(dir, "older.jsonl", [meta, user("resume the audit")], 100);
     expect(await openingPrompt(live)).toBeNull();
     expect(await findTranscript(dir, "resume the audit")).toBe(older);
+  });
+
+  // Pi's layout: <sessions>/--<cwd>--/<iso>_<uuid>.jsonl, a header line, then
+  // entries linked by id/parentId; branching appends to the same file.
+  const piHeader = JSON.stringify({ type: "session", version: 3, id: "s-1", timestamp: "2026-10-01T00:00:00.000Z", cwd: "/work/repo" });
+  const piEntry = (id, parentId, type, fields = {}) =>
+    JSON.stringify({ type, id, parentId, timestamp: "2026-10-01T00:00:01.000Z", ...fields });
+  const piMessage = (id, parentId, role, text) =>
+    piEntry(id, parentId, "message", { message: { role, content: [{ type: "text", text }], timestamp: 1 } });
+
+  test("a Pi session's opening prompt is the first user message on the branch that ends at the last entry", async () => {
+    const dir = tempDir();
+    const path = transcript(
+      dir,
+      "--work-repo--/2026-10-01T00-00-00-000Z_s-1.jsonl",
+      [
+        piHeader,
+        piMessage("sys", null, "system", "You are Pi."),
+        piMessage("u1", "sys", "user", "abandoned opening"),
+        piMessage("a1", "u1", "assistant", "ok"),
+        piEntry("sum", "sys", "branch_summary", { fromId: "a1", summary: "tried A" }),
+        piMessage("u2", "sum", "user", "ship the release lanes"),
+        piMessage("a2", "u2", "assistant", "on it"),
+        piMessage("t2", "a2", "toolResult", "done"),
+        piMessage("u3", "t2", "user", "a later prompt"),
+      ],
+      100,
+    );
+    expect(await openingPrompt(path)).toBe("ship the release lanes");
+  });
+
+  test("a Pi session whose leaf is on the first branch keeps that branch's opening", async () => {
+    const dir = tempDir();
+    const path = transcript(
+      dir,
+      "--work-repo--/s.jsonl",
+      [
+        piHeader,
+        piMessage("u1", null, "user", "first branch opening"),
+        piMessage("a1", "u1", "assistant", "ok"),
+        piMessage("u2", null, "user", "second root opening"),
+        piEntry("c1", "a1", "custom", { customType: "pstack-agents", data: {} }),
+      ],
+      100,
+    );
+    expect(await openingPrompt(path)).toBe("first branch opening");
+  });
+
+  test("a raw U+2028 or U+2029 inside a record does not split it", async () => {
+    const dir = tempDir();
+    const claude = transcript(dir, "c.jsonl", [meta, user("fix the parser\u2028please"), user("a later prompt")], 100);
+    const pi = transcript(
+      dir,
+      "--work-repo--/s.jsonl",
+      [piHeader, piMessage("u1", null, "user", "ship the release"), piMessage("a1", "u1", "assistant", "line\u2029break"), piMessage("u2", "a1", "user", "a later prompt")],
+      100,
+    );
+    expect(await openingPrompt(claude)).toBe("fix the parser\u2028please");
+    expect(await openingPrompt(pi)).toBe("ship the release");
+  });
+
+  test("a Pi session with no user message on its active branch has no opening prompt", async () => {
+    const dir = tempDir();
+    const path = transcript(
+      dir,
+      "--work-repo--/s.jsonl",
+      [piHeader, piMessage("u1", null, "user", "dead"), piEntry("m", null, "model_change", { provider: "p", modelId: "m" })],
+      100,
+    );
+    expect(await openingPrompt(path)).toBeNull();
+  });
+
+  test("findTranscript finds a Pi session among Claude transcripts in the same tree", async () => {
+    const dir = tempDir();
+    transcript(dir, "claude.jsonl", [meta, user("review issue 59")], 100);
+    const pi = transcript(dir, "--work-repo--/s.jsonl", [piHeader, piMessage("u1", null, "user", "review issue 59 on Pi")], 200);
+    expect(await findTranscript(dir, "on Pi")).toBe(pi);
+    expect(await findTranscript(dir, "issue 59")).toBe(pi);
+  });
+
+  test("a Codex rollout is refused by name instead of read as an empty Claude transcript", async () => {
+    const dir = tempDir();
+    const rollout = transcript(
+      dir,
+      "rollout.jsonl",
+      [
+        JSON.stringify({ type: "session_meta", payload: { id: "r-1", cwd: "/work/repo" } }),
+        JSON.stringify({ type: "response_item", payload: { type: "message", role: "user", content: [{ type: "input_text", text: "ship the release" }] } }),
+      ],
+      100,
+    );
+    await expect(openingPrompt(rollout)).rejects.toThrow(/Codex rollout/);
+    await expect(findTranscript(dir, "ship the release")).rejects.toThrow(/Codex rollout/);
   });
 
   test("the CLI prints the path and exits 1 when nothing matches", () => {

@@ -24,9 +24,9 @@ import {
   applyRegions,
   assertChangesHeading,
   changes,
-  codexNoteSkills,
   deriveSkill,
   loadLeadLines,
+  noteSkills,
   effortAgents,
   effortSection,
   OWNED_DIRS,
@@ -46,14 +46,15 @@ import {
   stampVersion,
   strayModelSlugs,
   tableRows,
-  validateCodexMarketplace,
   validateHooks,
 } from "../tools/generate.mjs";
+import { piModelNamesSection, RUNTIMES, validateCodexMarketplace, validatePiPackage } from "../tools/runtimes.mjs";
 import { walk } from "../tools/validate-skills.mjs";
 
 const repoRoot = fileURLToPath(new URL("..", import.meta.url));
 const models = loadModels();
 const leads = loadLeadLines();
+const [codex, pi] = RUNTIMES;
 
 const lines = (text) => text.split("\n");
 const spanned = (locate, doc) => {
@@ -130,6 +131,25 @@ describe("regions", () => {
   test("applyRegions leaves a file the generator does not own untouched", () => {
     const text = "# other\n\n## Models\n\nprose\n";
     expect(applyRegions("plugins/pstack/skills/other/SKILL.md", text, models)).toBe(text);
+  });
+});
+
+describe("runtime model names", () => {
+  test("each runtime's mapping file owns a stamped Model names section", () => {
+    for (const runtime of RUNTIMES) {
+      expect(regions(models).filter((r) => r.file === runtime.tools).map((r) => r.name)).toEqual(["Model names section"]);
+    }
+  });
+
+  test("the Pi section tables every alias per provider, names the fallback, and names the sheet override", () => {
+    const tables = { ...models.pi.models, marker: { opus: "marker/o", fable: "marker/f", sonnet: "marker/s", haiku: "marker/h" } };
+    const text = piModelNamesSection({ ...models, pi: { fallback: "marker", models: tables } });
+    expect(text).toContain(`| Alias | ${Object.keys(tables).map((p) => `\`${p}\``).join(" | ")} |`);
+    for (const alias of models.available) {
+      expect(text).toContain(`| \`${alias}\` | ${Object.values(tables).map((t) => `\`${t[alias]}\``).join(" | ")} |`);
+    }
+    expect(text).toContain("in the `marker` column for any other provider");
+    expect(text).toContain("`pi models: ");
   });
 });
 
@@ -212,6 +232,7 @@ describe("manifests", () => {
   const codex = json("plugins/pstack/.codex-plugin/plugin.json");
   const claudeMarketplace = json(".claude-plugin/marketplace.json");
   const codexMarketplace = json(".agents/plugins/marketplace.json");
+  const piPackage = json("package.json");
 
   test("the plugin and marketplace manifests agree on every fact they repeat", () => {
     const shared = ({ name, author, homepage, repository, license, keywords }) =>
@@ -220,6 +241,8 @@ describe("manifests", () => {
     expect(shared(codex)).toEqual(shared(claude));
     expect(claudeMarketplace.owner).toEqual(claude.author);
     expect(claudeMarketplace.plugins.map(({ name, source }) => [name, source])).toEqual([[claude.name, "./plugins/pstack"]]);
+    expect(shared(piPackage)).toEqual({ ...shared(claude), keywords: ["pi-package", ...claude.keywords] });
+    expect(piPackage.version).toBe(claude.version);
     expect(codexMarketplace.name).toBe(claudeMarketplace.name);
     expect(codexMarketplace.interface.displayName).toBe(codex.interface.displayName);
     expect(codexMarketplace.plugins.map(({ name, source, category }) => [name, source.path, category])).toEqual([
@@ -228,9 +251,46 @@ describe("manifests", () => {
   });
 });
 
+describe("validatePiPackage", () => {
+  const ENTRY = "plugins/pstack/pi/index.ts";
+  const manifest = (pi, extra = {}) => JSON.stringify({ name: "pstack", keywords: ["pi-package"], ...extra, pi });
+  const good = { skills: ["./plugins/pstack/skills"], extensions: [`./${ENTRY}`] };
+  const everything = () => true;
+
+  test("accepts the skills tree and the extension entry when both exist", () => {
+    expect(() => validatePiPackage(manifest(good), { pathExists: everything })).not.toThrow();
+  });
+
+  test("names each listed path that does not exist", () => {
+    const pathExists = (rel) => rel !== "plugins/pstack/skill";
+    expect(() =>
+      validatePiPackage(manifest({ ...good, skills: ["./plugins/pstack/skill"] }), { pathExists }),
+    ).toThrow("package.json: pi.skills names ./plugins/pstack/skill, which does not exist");
+  });
+
+  test("requires the skills tree and the extension entry", () => {
+    expect(() => validatePiPackage(manifest({ ...good, skills: [] }), { pathExists: everything })).toThrow(
+      "package.json: pi.skills must list ./plugins/pstack/skills",
+    );
+    const { extensions, ...skillsOnly } = good;
+    expect(() => validatePiPackage(manifest(skillsOnly), { pathExists: everything })).toThrow(
+      `package.json: pi.extensions must list ./${ENTRY}`,
+    );
+  });
+
+  test("requires the pi-package keyword and no runtime dependencies", () => {
+    expect(() => validatePiPackage(manifest(good, { keywords: [] }), { pathExists: everything })).toThrow(
+      'package.json: keywords must include "pi-package"',
+    );
+    expect(() => validatePiPackage(manifest(good, { dependencies: { x: "1" } }), { pathExists: everything })).toThrow(
+      "package.json: the Pi package has no runtime dependencies",
+    );
+  });
+});
+
 describe("validateHooks", () => {
-  const hooks = (command) =>
-    JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command }] }] } });
+  const hooks = (command, commandWindows) =>
+    JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: "command", command, commandWindows }] }] } });
   const exec = { mode: 0o755 };
   const plain = { mode: 0o644 };
 
@@ -255,6 +315,60 @@ describe("validateHooks", () => {
     );
     expect(() => validateHooks(hooks('"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh"'), { statOf: () => plain })).toThrow(
       "hooks/session-start.sh is not executable",
+    );
+  });
+
+  test("checks the Windows override path without requiring an executable bit for PowerShell", () => {
+    const cmd = hooks(
+      '"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh" codex',
+      'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "${CLAUDE_PLUGIN_ROOT}/hooks/session-start.ps1"',
+    );
+    const statOf = (rel) => rel.endsWith(".sh") ? exec : plain;
+    expect(() => validateHooks(cmd, { statOf })).not.toThrow();
+    expect(() => validateHooks(cmd, { statOf: (rel) => rel.endsWith(".sh") ? exec : null })).toThrow(
+      "SessionStart: hooks/session-start.ps1 does not exist",
+    );
+  });
+
+  test("names a hook without a command, even when it has a Windows override", () => {
+    const windows = 'powershell.exe -File "${CLAUDE_PLUGIN_ROOT}/hooks/session-start.ps1"';
+    for (const cmd of [hooks(undefined), hooks(undefined, windows)]) {
+      expect(() => validateHooks(cmd, { statOf: () => plain })).toThrow(
+        "SessionStart: hook must have required properties command",
+      );
+    }
+  });
+
+  test("faults a Windows override that is not a string and names the file", () => {
+    const cmd = hooks('"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh"', 5);
+    expect(() => validateHooks(cmd, { statOf: () => exec, file: "hooks/codex-hooks.json" })).toThrow(
+      "hooks/codex-hooks.json:\n  SessionStart: commandWindows must be string",
+    );
+  });
+
+  test("faults a key no hook type documents, so a misspelt override is not dropped", () => {
+    const hook = { type: "command", command: '"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh"', commandWindow: "x.ps1" };
+    const cmd = JSON.stringify({ hooks: { SessionStart: [{ hooks: [hook] }] } });
+    expect(() => validateHooks(cmd, { statOf: () => exec })).toThrow("SessionStart: unknown key commandWindow");
+  });
+
+  test("accepts a prompt hook, which carries a prompt instead of a command", () => {
+    const stop = (hook) => JSON.stringify({ hooks: { Stop: [{ hooks: [hook] }] } });
+    expect(() => validateHooks(stop({ type: "prompt", prompt: "Review $ARGUMENTS" }), { statOf: () => null })).not.toThrow();
+    expect(() => validateHooks(stop({ type: "prompt" }), { statOf: () => null })).toThrow(
+      "Stop: hook must have required properties prompt",
+    );
+    expect(() => validateHooks(stop({ type: "webhook", command: "x" }), { statOf: () => null })).toThrow(
+      'Stop: hook type "webhook" is not one of command, http, mcp_tool, prompt, agent',
+    );
+    expect(() => validateHooks(stop({ type: "constructor" }), { statOf: () => null })).toThrow(
+      'Stop: hook type "constructor" is not one of command, http, mcp_tool, prompt, agent',
+    );
+  });
+
+  test("faults an event whose value is not a list of matcher groups", () => {
+    expect(() => validateHooks(JSON.stringify({ hooks: { SessionStart: {} } }), { statOf: () => exec })).toThrow(
+      "hooks/hooks.json:\n  hooks.SessionStart must be array",
     );
   });
 
@@ -314,7 +428,7 @@ describe("slashCommands", () => {
     for (const menu of samples) {
       let parsed;
       try {
-        parsed = Bun.YAML.parse(promptStub({ name: "b", menu }).split("---\n")[1]).description;
+        parsed = Bun.YAML.parse(promptStub({ name: "b", menu }, RUNTIMES[0]).split("---\n")[1]).description;
       } catch {}
       let accepted = true;
       try {
@@ -453,17 +567,27 @@ describe("lead lines", () => {
     expect(stampLeadLine("no heading\n", "Lead.")).toBeNull();
   });
 
-  test("the Codex notes table lists its skills in row order and rejects a row without one", () => {
-    const table = (...rows) => ["| Skill | On Codex |", "|-------|----------|", ...rows, "", "after"].join("\n");
-    expect(codexNoteSkills(table("| `how` | fan-out |", "| `teach` | images |"))).toEqual(["how", "teach"]);
-    expect(() => codexNoteSkills(table("| how | fan-out |"))).toThrow("does not start with a backticked skill: | how |");
-    expect(() => codexNoteSkills("no table\n")).toThrow('"| Skill | On Codex |" table header not found');
+  test("Codex stamps a preamble on its noted skills and Pi stamps none", () => {
+    expect(RUNTIMES.map((r) => r.name)).toEqual(["Codex", "Pi"]);
+    expect(codex.preamble).toBe(
+      "On Codex, read the [platform mapping](../poteto-mode/references/codex-tools.md), including its per-skill notes, before following this skill.",
+    );
+    expect(pi.preamble).toBeNull();
+    expect([...leads.values()].filter((line) => line.includes("pi-tools.md"))).toEqual([]);
   });
 
-  test("a prompt stub points at codex-tools.md unless its skill carries the Codex preamble", () => {
+  test("a notes table lists its skills in row order and rejects a row without one", () => {
+    const table = (...rows) => ["| Skill | On Pi |", "|-------|-------|", ...rows, "", "after"].join("\n");
+    expect(noteSkills(pi, table("| `how` | fan-out |", "| `teach` | images |"))).toEqual(["how", "teach"]);
+    expect(() => noteSkills(pi, table("| how | fan-out |"))).toThrow("does not start with a backticked skill: | how |");
+    expect(() => noteSkills(codex, "no table\n")).toThrow('"| Skill | On Codex |" table header not found');
+  });
+
+  test("a prompt stub points at its runtime's mapping file unless its skill carries that runtime's preamble", () => {
     const pointer = "through `poteto-mode/references/codex-tools.md`, including its Per-skill notes.";
-    expect(promptStub({ name: "tdd", menu: "m" }, { preamble: false })).toContain(pointer);
-    expect(promptStub({ name: "how", menu: "m" }, { preamble: true })).toBe(
+    expect(promptStub({ name: "tdd", menu: "m" }, codex, { preamble: false })).toContain(pointer);
+    expect(promptStub({ name: "tdd", menu: "m" }, pi, { preamble: false })).toContain("`poteto-mode/references/pi-tools.md`");
+    expect(promptStub({ name: "how", menu: "m" }, codex, { preamble: true })).toBe(
       "---\nname: how\ndescription: m\ndisable-model-invocation: true\n---\n\nInvoke the `how` skill and follow it.\n",
     );
   });
@@ -550,6 +674,7 @@ describe("plan, changes, apply", () => {
   const repoCopy = () => {
     const dir = scratch("pstack-generate-");
     cpSync(repoRoot, dir, { recursive: true, filter: (src) => ![".git", "node_modules"].includes(basename(src)) });
+    symlinkSync(join(repoRoot, "node_modules"), join(dir, "node_modules"));
     return dir;
   };
   const snapshot = (dir) => Object.fromEntries(walk(dir).map((path) => [path, readFileSync(path, "utf8")]));
@@ -763,10 +888,16 @@ describe("plan, changes, apply", () => {
     }
   });
 
+  test.each(RUNTIMES.map((runtime) => [runtime.name, runtime]))("a %s per-skill note for a skill that does not exist fails", (_, runtime) => {
+    const root = repoCopy();
+    const tools = join(root, runtime.tools);
+    writeFileSync(tools, readFileSync(tools, "utf8").replace(/^\| `why` \|/m, "| `gone` |"));
+    expect(() => loadLeadLines(root)).toThrow(`${runtime.tools}: per-skill note for "gone", which has no SKILL.md`);
+  });
+
   test("problems reports a lead line in a file that does not own it", () => {
     const root = repoCopy();
-    const [, preamble] = [...loadLeadLines(root)].find(([, line]) => line.startsWith("On Codex"));
-    append(root, "plugins/pstack/skills/tdd/SKILL.md", `\n${preamble}\n`);
+    append(root, "plugins/pstack/skills/tdd/SKILL.md", `\n${codex.preamble}\n`);
     const codexTools = "plugins/pstack/skills/poteto-mode/references/codex-tools.md";
     writeFileSync(join(root, codexTools), readFileSync(join(root, codexTools), "utf8").replace(/^\| `why` \|.*\n/m, ""));
     const failures = problems(root).filter((f) => f.startsWith("generator-owned lead lines"));
