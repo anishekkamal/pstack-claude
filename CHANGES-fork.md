@@ -1,0 +1,23 @@
+# CHANGES (fork)
+
+What this fork adds on top of Michael Denyer's port. The port's own changelog is CHANGES.md and follows upstream exactly; VERSION follows the port's version so the daily sync never conflicts on it.
+
+## 0.10.2 - daily sync with the port
+
+`tools/sync-upstream.sh` merges the port's main with upstream winning every conflicting hunk, then `tools/fork-overlay.mjs` puts the fork's facts back (manifests, the poteto-mode driver line, the verify-web row and counts in docs/reference.md, the create-verification-skill and codex-tools pointers, .gitignore). `.github/workflows/sync-upstream.yml` runs it daily and pushes main, or opens an issue when the merge needs a human. CHANGES.md and VERSION now follow the port; fork notes live here.
+
+This file is the release changelog, with one `## <version> - <title>` entry per release, newest first. The Cursor-to-Claude rewrite rules live in [`tools/substitutions.json`](tools/substitutions.json), and the [sync boundary](CONTRIBUTING.md#the-sync-boundary) in `CONTRIBUTING.md` defines how a change to upstream's skill content is declared.
+
+## 0.10.1 - sync to the port's 0.9.72 (upstream v0.15.13)
+
+Fork release (Anishek Kamal). Merges Michael Denyer's port through 0.9.72: upstream pstack 0.15.6 to 0.15.13 (`/correct`, `/poteto-help` with its prompting and recipes references, `/benchmark-checklist`, fresh subagents by default, the hourly autopilot tick, schema-first casts, PR body headings, the `/architect` hardening) plus the port's Pi runtime, worktree-audit fixes and test tooling. The verify-web harness is unchanged; poteto-mode's driver line keeps naming it. Skill count is now 35 public skills and 24 principles.
+
+## 0.10.0 - the verify-web harness
+
+Fork release (Anishek Kamal). The port's `/create-verification-skill` told an agent how to write a verification harness; every repo got whatever the agent improvised that day, and perf captures were re-derived each session. Lauren Tan's talk on agent trust describes the fix: a maintained CLI inside the skill plus a feature map that is the app's materialized memory. `plugins/pstack/skills/verify-web/` ships that CLI.
+
+`scripts/control` is a daemon plus thin client over Playwright and the Chrome DevTools Protocol. The daemon owns the browser for the whole run, so console and network buffers and a running trace survive across separate agent commands. It launches a disposable Chromium with a live remote-debugging endpoint, or attaches over `--cdp` to an Electron app or a Chrome the user started. Drive commands target accessible roles and names, with `--within-role` scoping and a strict-mode error that lists both matches when a target is ambiguous. Evidence commands: ARIA `snapshot`, `screenshot`, `text`, `html`, read-only `eval`, `console`, `network`, `errors`, `metrics` (LCP, CLS and long tasks from observers installed at document start, plus JS heap and DOM counts). Performance commands: `trace start|stop` with a long-task summary, `profile start|stop` with top self-time frames, `heap --gc`, `gc`, `throttle`. `verdict` writes `verdict.md` with the artifact list; `cleanup` stops only the PIDs it recorded and keeps `evidence/<run-id>/`. `launch` refuses to start the app when the URL already answers, so a shared instance is never double-driven; `--no-app` drives one the user started.
+
+Per-repo state lives at `.claude/skills/verify/`, the path poteto-mode's driver line already names: `control init` writes the project `verify` skill, `verify.config.json`, the feature-map templates and `scripts/control` shims there, and the CLI finds that directory by walking up from the working directory. `control setup` installs Playwright under `~/.claude/verify-web/` once per machine, or `--channel chrome` uses the installed browser; the harness also resolves a Playwright already in the repo or installed globally. `create-verification-skill` runs `control init` for web and Electron surfaces instead of hand-writing a harness, and `maintain-verification-skill` audits the generated map unchanged. `references/` carries the proof standards and verdict format, the perf recipes, and the trust ladder from the talk: where each agent correction belongs (architecture, static analysis, rules and skills, review), the gardener pass, and handoff levels with the evidence needed to move up. `docs/verify-web.md` is the walkthrough. The marketplace is named `pstack-anishek` so it installs beside the upstream port; the plugin name stays `pstack`.
+
+The harness was executed end to end against a sample app before release: launched and attached modes, every command, the shipped example feature file verbatim, and cleanup leaving no process behind.

@@ -1,0 +1,66 @@
+name: Sync upstream port
+
+# Every day: merge michael-denyer/pstack-claude main into this fork, re-apply the fork overlay
+# (tools/fork-overlay.mjs), regenerate, run the checks, and push to main. When the merge cannot be
+# resolved automatically, an issue is opened instead and nothing is pushed. Run it by hand from the
+# Actions tab with "Run workflow".
+
+on:
+  schedule:
+    - cron: "40 4 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # pushes the merged main
+      issues: write # opens or closes the manual-merge issue
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: "1.3.14"
+      - name: Merge upstream, re-apply the fork overlay, regenerate, check
+        id: sync
+        run: |
+          set +e
+          bash tools/sync-upstream.sh | tee sync.log
+          code=${PIPESTATUS[0]}
+          set -e
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          if grep -q '^synced:' sync.log; then echo "changed=true" >> "$GITHUB_OUTPUT"; else echo "changed=false" >> "$GITHUB_OUTPUT"; fi
+          [ "$code" = "0" ] || [ "$code" = "2" ]
+      - name: Push main
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}" HEAD:main
+      - name: Open an issue when the merge needs a human
+        if: steps.sync.outputs.code == '2'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Upstream sync needs a manual merge"
+          if gh issue list --state open --search "$title in:title" --json number --jq 'length' | grep -qv '^0$'; then
+            echo "issue already open"; exit 0
+          fi
+          gh issue create --title "$title" --body "$(printf 'The daily sync could not merge michael-denyer/pstack-claude main automatically.\n\nConflicting files:\n```\n%s\n```\n\nRun `tools/sync-upstream.sh` locally, resolve, run `node tools/fork-overlay.mjs`, then push main. The next run closes this when the merge is in.' "$(cat sync-conflicts.txt)")"
+      - name: Close the manual-merge issue once the sync is in
+        if: steps.sync.outputs.code == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --state open --search "Upstream sync needs a manual merge in:title" --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Synced automatically on $(date -u +%Y-%m-%d)."
+          done
