@@ -1,14 +1,14 @@
 {
   "name": "pstack",
   "private": true,
-  "version": "0.9.72",
-  "description": "If you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence. Pi package of the Claude Code plugin; skills are shared, tool names resolve via skills/poteto-mode/references/pi-tools.md. Original pstack by Lauren Tan (poteto). This fork adds the verify-web harness. Port by Michael Denyer.",
+  "version": "0.9.74",
+  "description": "If you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence. Pi package of the Claude Code plugin; skills are shared, tool names resolve via skills/poteto-mode/references/pi-tools.md. Original pstack by Lauren Tan (poteto).",
   "author": {
-    "name": "Anishek Kamal",
-    "url": "https://github.com/anishekkamal"
+    "name": "Michael Denyer",
+    "url": "https://github.com/michael-denyer"
   },
-  "homepage": "https://github.com/anishekkamal/pstack-claude",
-  "repository": "https://github.com/anishekkamal/pstack-claude",
+  "homepage": "https://github.com/michael-denyer/pstack-claude",
+  "repository": "https://github.com/michael-denyer/pstack-claude",
   "license": "MIT",
   "keywords": [
     "pi-package",
@@ -27,10 +27,7 @@
     "codex",
     "opencode",
     "gemini-cli",
-    "prime-agent",
-    "verification",
-    "chrome-devtools-protocol",
-    "playwright"
+    "prime-agent"
   ],
   "pi": {
     "skills": [

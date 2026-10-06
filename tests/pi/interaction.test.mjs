@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from "bun:test";
 
 import { DONE, OTHER } from "../../plugins/pstack/pi/ask.ts";
-import { useWorld } from "./harness.mjs";
+import { resultText, useWorld } from "./harness.mjs";
 
 const setup = useWorld();
 
@@ -336,19 +336,103 @@ describe("/loop", () => {
 
   test("a new self-paced loop cancels the previous loop's pending wakeup", async () => {
     const { pi, ctx, run } = loop();
+    await run("watch old PR");
     await pi.call("schedule_wakeup", { delaySeconds: 60, prompt: "/loop watch old PR" }, ctx);
     await run("watch new PR");
     jest.advanceTimersByTime(60_000);
-    expect(pi.userMessages).toHaveLength(1);
-    expect(pi.userMessages[0].content).toStartWith("watch new PR\n");
+    expect(pi.userMessages.map((m) => m.content)).toEqual([expect.stringContaining("watch old PR\n"), expect.stringContaining("watch new PR\n")]);
 
     await pi.call("schedule_wakeup", { delaySeconds: 120, prompt: "/loop watch new PR" }, ctx);
     jest.advanceTimersByTime(120_000);
     expect(pi.userMessages.map((m) => m.content)).toEqual([
+      expect.stringContaining("watch old PR\n"),
       expect.stringContaining("watch new PR\n"),
       "/loop watch new PR",
     ]);
   });
+
+  for (const rearm of ["/loop watch PR 42", "watch PR 42", "/loop 5m watch PR 42"]) {
+    test(`/loop stop during a self-paced iteration ends the loop: a wakeup that run then asks for with prompt "${rearm}" is refused, and the user is told`, async () => {
+      let idle = true;
+      const { pi, ctx, run, ui } = loop({ idle: () => idle });
+      await run("watch PR 42");
+      idle = false;
+      await run("stop");
+      expect(ui.calls.at(-1).message).toBe("Loop stopped.");
+      const refused = await pi.call("schedule_wakeup", { delaySeconds: 60, prompt: rearm }, { ...ctx, ui });
+      expect(resultText(refused)).toContain("Not scheduled");
+      expect(refused.details).toEqual({ refused: true });
+      expect(ui.calls.at(-1).message).toContain("was not scheduled");
+      idle = true;
+      jest.advanceTimersByTime(3_600_000);
+      expect(pi.userMessages).toHaveLength(1);
+    });
+  }
+
+  test("/loop stop during a run cuts that run off even with no loop live, and a run after it settles schedules a wakeup again", async () => {
+    let idle = false;
+    const { pi, ctx, run, ui } = loop({ idle: () => idle });
+    const wake = () => pi.call("schedule_wakeup", { delaySeconds: 60, prompt: "later" }, { ...ctx, ui });
+    await run("stop");
+    expect(ui.calls.at(-1).message).toBe("No loop was running.");
+    expect((await wake()).details).toEqual({ refused: true });
+    await pi.emit("agent_settled", {}, ctx);
+    idle = true;
+    expect(resultText(await wake())).toContain("Wakeup scheduled");
+    jest.advanceTimersByTime(60_000);
+    expect(pi.userMessages.map((m) => m.content)).toEqual(["later"]);
+  });
+
+  test("a new self-paced loop asked for during an old iteration starts once that run settles: the old run can neither re-arm nor cancel it, and the new loop re-arms itself", async () => {
+    let idle = true;
+    const { pi, ctx, run, ui } = loop({ idle: () => idle });
+    const wake = (params) => pi.call("schedule_wakeup", params, { ...ctx, ui });
+    await run("watch old");
+    idle = false;
+    await run("watch new");
+    expect(ui.calls.at(-1).message).toBe("The loop starts when the current run ends.");
+    expect((await wake({ delaySeconds: 60, prompt: "/loop watch old" })).details).toEqual({ refused: true });
+    expect((await wake({ stop: true })).details).toEqual({ cancelled: false });
+    jest.advanceTimersByTime(60_000);
+    expect(pi.userMessages).toHaveLength(1);
+
+    await pi.emit("agent_settled", {}, ctx);
+    idle = true;
+    jest.advanceTimersByTime(1_000);
+    expect(pi.userMessages).toHaveLength(2);
+    expect(resultText(await wake({ delaySeconds: 120, prompt: "/loop watch new" }))).toContain("Wakeup scheduled");
+    jest.advanceTimersByTime(120_000);
+    expect(pi.userMessages.map((m) => m.content)).toEqual([
+      expect.stringContaining("watch old\n"),
+      expect.stringContaining("watch new\n"),
+      "/loop watch new",
+    ]);
+  });
+
+  test("a fixed loop asked for during a run sends its first prompt once that run settles", async () => {
+    let idle = false;
+    const { pi, ctx, run } = loop({ idle: () => idle });
+    await run("5m check the deploy");
+    jest.advanceTimersByTime(30_000);
+    expect(pi.userMessages).toEqual([]);
+    await pi.emit("agent_settled", {}, ctx);
+    idle = true;
+    jest.advanceTimersByTime(1_000);
+    expect(pi.userMessages.map((m) => m.content)).toEqual(["check the deploy"]);
+  });
+
+  for (const [what, started, prompt] of [
+    ["a live loop's re-arm in other words than its prompt", "watch  PR 42", "/loop Watch PR 42."],
+    ["a /loop prompt with no loop started", null, "/loop babysit PR 42"],
+  ]) {
+    test(`with no /loop command during the run, a wakeup is scheduled whatever its prompt says: ${what}`, async () => {
+      const { pi, ctx, run } = loop();
+      if (started) await run(started);
+      expect(resultText(await pi.call("schedule_wakeup", { delaySeconds: 60, prompt }, ctx))).toContain("Wakeup scheduled");
+      jest.advanceTimersByTime(60_000);
+      expect(pi.userMessages.at(-1).content).toBe(prompt);
+    });
+  }
 
   test("a new self-paced loop also stops the previous fixed interval", async () => {
     const { pi, run } = loop();
@@ -360,22 +444,28 @@ describe("/loop", () => {
 
   test("a new fixed loop cancels the previous loop's pending wakeup and interval", async () => {
     const { pi, ctx, run } = loop();
+    await run("watch old PR");
     await pi.call("schedule_wakeup", { delaySeconds: 60, prompt: "/loop watch old PR" }, ctx);
     await run("1m old task");
     await run("2m new task");
     jest.advanceTimersByTime(120_000);
-    expect(pi.userMessages.map((m) => m.content)).toEqual(["old task", "new task", "new task"]);
+    expect(pi.userMessages.map((m) => m.content)).toEqual([expect.stringContaining("watch old PR\n"), "old task", "new task", "new task"]);
   });
+
+  // Lets a handler reach its first fire or its failure; fake timers rule out sleeping.
+  const drain = async () => {
+    for (let i = 0; i < 20; i++) await Promise.resolve();
+  };
 
   for (const mode of ["print", "json"]) {
     test(`in ${mode} mode /loop returns only once the run it started settles, since pi disposes the session when it returns`, async () => {
       const { pi, ctx, run } = loop({ mode });
       let returned = false;
       const done = run("tick").then(() => (returned = true));
-      await Promise.resolve();
+      await drain();
       expect(pi.userMessages).toHaveLength(1);
       jest.advanceTimersByTime(60_000);
-      await Promise.resolve();
+      await drain();
       expect(returned).toBe(false);
       await pi.emit("agent_settled", {}, ctx);
       await done;
@@ -383,11 +473,59 @@ describe("/loop", () => {
     });
   }
 
+  for (const [why, ctxOpts, args, reason] of [
+    ["no model is selected", { model: null }, "1m tick", "no model is selected"],
+    ["the selected model has no credentials", { auth: "none" }, "1m tick", "no credentials"],
+    ["the prompt is an extension command, which pi runs without starting a run", {}, "1m /loop stop", "/loop is an extension command"],
+  ]) {
+    test(`in print mode /loop fails at once and marks the process failed when ${why}, since no settle would follow`, async () => {
+      const { pi, run } = loop({ mode: "print", ...ctxOpts });
+      const exitCode = process.exitCode;
+      try {
+        let outcome = "still waiting";
+        run(args).then(
+          () => (outcome = "returned"),
+          (e) => (outcome = e),
+        );
+        await drain();
+        expect(outcome).toBeInstanceOf(Error);
+        expect(outcome.message).toContain(reason);
+        expect(pi.userMessages).toEqual([]);
+        expect(process.exitCode).toBe(1);
+      } finally {
+        // Bun ignores an undefined exit code, and a leftover 1 would fail the whole test run.
+        process.exitCode = exitCode ?? 0;
+      }
+    });
+  }
+
+  for (const [what, ctxOpts, args, sent] of [
+    ["on credentials only pi's live check finds", { auth: "live-check-only" }, "1m tick", "tick"],
+    ["a slash prompt that names no extension command, such as a skill", {}, "1m /skill:babysit 42", "/skill:babysit 42"],
+  ]) {
+    test(`in print mode /loop still runs ${what}`, async () => {
+      const { pi, ctx, run } = loop({ mode: "print", ...ctxOpts });
+      const done = run(args);
+      await drain();
+      expect(pi.userMessages.map((m) => m.content)).toEqual([sent]);
+      await pi.emit("agent_settled", {}, ctx);
+      await done;
+    });
+  }
+
+  test("in tui mode /loop fires a prompt pi would refuse, since pi reports the refusal itself and nothing waits on the run", async () => {
+    const { pi, run } = loop({ auth: "none" });
+    await run("1m tick");
+    expect(pi.userMessages.map((m) => m.content)).toEqual(["tick"]);
+  });
+
   test("/loop stop also cancels a self-paced wakeup", async () => {
-    const { pi, ctx, run } = loop();
+    const { pi, ctx, run, ui } = loop();
+    await run("watch");
     await pi.call("schedule_wakeup", { delaySeconds: 120, prompt: "/loop watch", reason: "r" }, ctx);
     await run("stop");
+    expect(ui.calls.at(-1).message).toBe("Loop stopped.");
     jest.advanceTimersByTime(3_600_000);
-    expect(pi.userMessages).toEqual([]);
+    expect(pi.userMessages).toHaveLength(1);
   });
 });

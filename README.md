@@ -1,8 +1,8 @@
 # pstack
 
-Lauren Tan's [pstack](https://github.com/cursor/plugins/tree/main/pstack) is an opinionated Cursor skill stack that improves agent outcomes. This is a port for Claude Code, Codex, Pi and other agent harnesses. It tracks upstream and also carries named policy forks, each declared in [`tools/forks.json`](tools/forks.json).
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?logo=buy-me-a-coffee&logoColor=white)](https://buymeacoffee.com/codenyer)
 
-This is [Anishek Kamal's fork](https://github.com/anishekkamal/pstack-claude) of [Michael Denyer's port](https://github.com/michael-denyer/pstack-claude). It adds `verify-web`, a shipped verification harness (Playwright over the Chrome DevTools Protocol, per-repo feature map, evidence and verdicts) built from Lauren Tan's talk on agent trust, so agents stop improvising a harness each session. Everything else tracks the port.
+Lauren Tan's [pstack](https://github.com/cursor/plugins/tree/main/pstack) is an opinionated Cursor skill stack that improves agent outcomes. This is a port for Claude Code, Codex, Pi, GitHub Copilot and other agent harnesses. It tracks upstream and also carries named policy forks, each declared in [`tools/forks.json`](tools/forks.json).
 
 Tell `poteto-mode` your goal and it will invoke the correct workflow for the task. It keeps your code concise, simple and verified.
 
@@ -38,7 +38,20 @@ pi install git:github.com/michael-denyer/pstack-claude
 
 The package loads the skills and the pstack Pi extension, which adds the subagent, question, and wake-up tools the skills use, plus `/loop` and the routing instruction. Invoke a skill with `/skill:<name>`.
 
-Run `setup-pstack` to change model defaults, set a reasoning effort per role (for example `arena runners: opus @xhigh, fable @max`, which Claude Code dispatches through the plugin's `pstack:effort-<level>` or `pstack:poteto-agent-<level>` agents; roles without a level keep the session's effort unless the sheet's `default effort` line names one), or turn automatic routing off. The plugin installs the routing hook on Claude Code and Codex; Codex asks you to trust it through `/hooks` before it runs. On Pi the extension injects the same routing instruction. In Claude Code, use `/pstack:setup-pstack`.
+### GitHub Copilot
+
+Run in your terminal:
+
+```shell
+copilot plugin marketplace add michael-denyer/pstack-claude
+copilot plugin install pstack@pstack-claude
+```
+
+This installs pstack for the Copilot CLI and the GitHub Copilot app, which share `~/.copilot`. Start a new session afterwards. Copilot ships no default pstack models, so the first skill that needs one runs `setup-pstack` to pick from the models your account lists, and later sessions reuse that choice.
+
+The Copilot build is tested on Copilot CLI 1.0.87 through 1.0.92. On those versions the routing hook's context reaches the session alongside other plugins' session-start context. If a later version keeps only one plugin's context, `setup-pstack` offers a [standing instruction](plugins/pstack/skills/setup-pstack/copilot.md#wire-it-in) for `~/.copilot/copilot-instructions.md` instead. On 1.0.92, once the CLI caches its computer-use experiment assignment, `copilot -p` sessions list no plugin skills and a `skill` call returns "Skill not found". Interactive sessions, the hooks, and the agents are unaffected.
+
+Run `setup-pstack` to change model defaults, set a reasoning effort per role (for example `arena runners: opus @xhigh, fable @max`, which Claude Code dispatches through the plugin's `pstack:effort-<level>` or `pstack:poteto-agent-<level>` agents; roles without a level keep the session's effort unless the sheet's `default effort` line names one), or turn automatic routing off. The plugin installs the routing hook on Claude Code, Codex, and GitHub Copilot; Codex asks you to trust it through `/hooks` before it runs. On Pi the extension injects the same routing instruction. In Claude Code and the Copilot CLI, use `/pstack:setup-pstack`.
 
 For Prime Agent, OpenCode, Gemini CLI, or skills-only installs for any harness, see [shared installation](docs/reference.md#shared-skills-installation).
 
@@ -53,14 +66,6 @@ For a bug, it reproduces the failure, uses `how` and `why` to investigate, deleg
 [Other playbooks](plugins/pstack/skills/poteto-mode/SKILL.md#playbooks) cover planning, features, refactoring, performance issues, investigations, prototypes, PR maintenance, shipping, and longer projects.
 
 ![poteto-mode on Claude Code, Codex, and Pi turns a request into verified work. Choose a playbook, plan and delegate with architect, arena, or swarm, then review and verify with interrogate, tests, and measurements. Project playbooks customize the workflow, and setup-pstack configures the model and reasoning effort per role. Supporting skills include how, why, and unslop.](assets/pstack-overview.png)
-
-## Verify with evidence
-
-```text
-/pstack:verify-web set up verification for this repo
-```
-
-`verify-web` writes `.claude/skills/verify/` into the repo: a project `verify` skill, a config, a feature map, and shims for the plugin's `control` CLI. From then on, "verify it in the app" means launch, doctor, drive the mapped feature by accessible role, capture ARIA snapshots, screenshots, console, network, traces or heap snapshots, and write a `VERIFIED` / `NOT VERIFIED` / `INCONCLUSIVE` verdict with the artifacts beside it. poteto-mode's playbooks route to that project skill automatically. [docs/verify-web.md](docs/verify-web.md) walks through installation, the first repo, the daily loop, and the trust ladder for deciding where each agent correction belongs.
 
 ## Details
 
@@ -77,6 +82,8 @@ pstack has no server or telemetry. Anything its skills ask your agent to read, i
 ## Contributing
 
 Thanks for helping make this port better. Bug reports, documentation fixes, and runtime improvements are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the checks and where your change belongs. Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+
+To support maintenance of this port, [buy the maintainer a coffee](https://buymeacoffee.com/codenyer).
 
 ## License
 
