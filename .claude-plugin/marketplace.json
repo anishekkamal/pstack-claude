@@ -1,8 +1,8 @@
 {
   "name": "pstack-anishek",
   "owner": {
-    "name": "Michael Denyer",
-    "url": "https://github.com/michael-denyer"
+    "name": "Anishek Kamal",
+    "url": "https://github.com/anishekkamal"
   },
   "description": "Anishek's fork of the Claude Code port of poteto's pstack: rigorous agent workflows plus the verify-web harness (Chrome DevTools Protocol verification with a per-repo feature map).",
   "plugins": [

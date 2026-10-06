@@ -2,13 +2,13 @@
   "name": "pstack",
   "displayName": "pstack (Claude Code port)",
   "version": "0.9.74",
-  "description": "If you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence. Ported from cursor/plugins/pstack to Claude Code. Original pstack by Lauren Tan (poteto).",
+  "description": "If you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence. Ported from cursor/plugins/pstack to Claude Code. Original pstack by Lauren Tan (poteto). This fork adds the verify-web harness. Port by Michael Denyer.",
   "author": {
-    "name": "Michael Denyer",
-    "url": "https://github.com/michael-denyer"
+    "name": "Anishek Kamal",
+    "url": "https://github.com/anishekkamal"
   },
-  "homepage": "https://github.com/michael-denyer/pstack-claude",
-  "repository": "https://github.com/michael-denyer/pstack-claude",
+  "homepage": "https://github.com/anishekkamal/pstack-claude",
+  "repository": "https://github.com/anishekkamal/pstack-claude",
   "license": "MIT",
   "keywords": [
     "pstack",
@@ -44,5 +44,7 @@
     "./effort-agents/poteto-agent-max.md",
     "./effort-agents/poteto-agent-medium.md",
     "./effort-agents/poteto-agent-xhigh.md"
-  ]
+  ],
+  "documentationUrl": "https://github.com/anishekkamal/pstack-claude/blob/main/docs/reference.md",
+  "supportUrl": "https://github.com/anishekkamal/pstack-claude/issues"
 }
