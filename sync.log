@@ -1,0 +1,47 @@
+upstream moved: 4 commit(s), ..5062f28
+Auto-merging .claude-plugin/marketplace.json
+Auto-merging docs/reference.md
+Auto-merging package.json
+Auto-merging plugins/pstack/.claude-plugin/plugin.json
+Auto-merging plugins/pstack/.codex-plugin/plugin.json
+Auto-merging plugins/pstack/skills/poteto-mode/SKILL.md
+Auto-merging tools/forks.json
+Merge made by the 'ort' strategy.
+ .claude-plugin/marketplace.json                    |  2 +-
+ CHANGES.md                                         | 22 +++++++++++
+ VERSION                                            |  2 +-
+ docs/reference.md                                  |  2 +-
+ package.json                                       |  4 +-
+ plugins/pstack/.claude-plugin/plugin.json          |  4 +-
+ plugins/pstack/.codex-plugin/plugin.json           |  4 +-
+ plugins/pstack/.github/plugin/plugin.json          |  2 +-
+ plugins/pstack/models.json                         |  2 +-
+ plugins/pstack/skills/architect/SKILL.md           |  2 +-
+ .../skills/architect/references/runner-prompt.md   |  2 +-
+ plugins/pstack/skills/arena/SKILL.md               |  4 +-
+ plugins/pstack/skills/blast-radius/SKILL.md        |  2 +-
+ plugins/pstack/skills/interrogate/SKILL.md         |  5 ++-
+ plugins/pstack/skills/poteto-help/SKILL.md         |  7 +++-
+ plugins/pstack/skills/poteto-mode/SKILL.md         |  2 +-
+ .../pstack/skills/poteto-mode/playbooks/feature.md |  2 +-
+ .../skills/poteto-mode/scripts/orch/orch.test.ts   |  2 +-
+ plugins/pstack/skills/reflect/SKILL.md             |  4 +-
+ plugins/pstack/skills/setup-pstack/SKILL.md        | 10 ++---
+ tests/skill-rules.test.mjs                         | 20 ++++++++++
+ tools/forks.json                                   |  6 +--
+ tools/substitutions.json                           | 43 ++++++++++++++++++++--
+ tools/upstream.json                                |  2 +-
+ 24 files changed, 120 insertions(+), 37 deletions(-)
+fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
+bun install v1.3.14 (0d9b296a)
+
++ typebox@1.3.34
+
+1 package installed [103.00ms]
+ok: 83 generated files current
+ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
+ok: 83 generated files current
+ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
+ok: local markdown links stay inside plugins/pstack/skills
+ok: no prose in plugins/pstack/skills points at a path outside it
+bun test v1.3.14 (0d9b296a)
