@@ -2,6 +2,28 @@
 
 This file is the release changelog, with one `## <version> - <title>` entry per release, newest first. The Cursor-to-Claude rewrite rules live in [`tools/substitutions.json`](tools/substitutions.json), and the [sync boundary](CONTRIBUTING.md#the-sync-boundary) in `CONTRIBUTING.md` defines how a change to upstream's skill content is declared.
 
+## 0.9.78 - sync to upstream df58112 (v0.15.15)
+
+The upstream pin moves from `2cbf585` to `df58112`, upstream v0.15.15, two commits. `/poteto-help` now offers `/setup-pstack` when the model sheet is missing and the answer depends on it. It asks at most once per chat, and a user who declines is told that every role keeps its default model. Upstream also dropped one model from its default panel and lowered its Opus effort from `max` to `xhigh`. The port takes neither change, because `models.json` sets the port's panel and effort. `setup-pstack` keeps the port's default-effort step in place of upstream's reworded budget step.
+
+The substitution rules that point a default model list at the Models section now match a list of any length, as does the rule for the model family sentence. New rules cover the delegate defaults in `poteto-mode`, the default-model column of the `reflect` reviewer table, and every slug in `setup-pstack`, so an upstream model change on those lines no longer conflicts with the port. `interrogate` says "the Reviewer labels below" and names no label run, since the generator stamps the table from the panel.
+
+Measured with `bun tools/sync.mjs pstack 1e56b29`, then `df58112`: 3 files merged, 2 updated, 80 unchanged, 36 excluded, and 2 conflicts, both resolved by hand. `poteto-help` keeps the port's `/swarm` row and takes upstream's `/interrogate` row. No file became port-only.
+
+## 0.9.77 - add haiku to the default panel
+
+The default panel is `opus`, `fable`, `sonnet`, `haiku`. With no override sheet, `arena` and `architect` run four runners, `interrogate` runs four reviewers, with `haiku` as Reviewer D, and the `arena` cross-judge pool includes `haiku`. A `pstack-models.md` sheet that names these roles keeps its own lists. The Codex panel is unchanged. On Pi, `haiku` resolves through the `pi.models` table in `models.json`.
+
+## 0.9.76 - keep the parent's verdict out of reflect's reviewer prompts
+
+reflect passes the transcript path to its reviewers with nothing beside it. When the finder cannot locate the transcript, the fallback digest records the session's prompts, corrections, tool calls, results, and files in turn order, and states no diagnosis, verdict, or cause. A reviewer that reads the parent's conclusion first tends to audit that conclusion instead of the session ([#231](https://github.com/michael-denyer/pstack-claude/issues/231)).
+
+## 0.9.75 - base delegate worktrees on the branch and separate parallel todolists
+
+The Feature playbook notes that Claude Code's `isolation: "worktree"` branches from the remote default branch unless `worktree.baseRef` is `"head"`. A delegate that builds on commits the default branch lacks now gets a worktree the parent creates from `HEAD`, and its brief names that base commit ([#228](https://github.com/michael-denyer/pstack-claude/issues/228)).
+
+poteto-mode's fallback todolist moves to `.audit/<task-slug>.todo.md` when several sessions share a checkout, beside the decision trail show-me-your-work already keeps there, so parallel sessions no longer write one `todo.md` ([#229](https://github.com/michael-denyer/pstack-claude/issues/229)).
+
 ## 0.9.74 - fix the code review's findings and bound Autopilot's verify rounds
 
 `watch-pr` no longer reports a PR ready, or stopped at a merge gate, from a reading GitHub has not settled. A no-checks reading becomes `ci-none` only when the same head has shown no checks for 60 seconds, whatever `--interval` is, so a fresh PR whose checks have not registered waits as `checks-unreported` and a repository with no CI reaches READY a minute later. Unknown mergeability waits as `mergeability-unknown` and is never READY. The watcher reads the PR facts again after the checks and retries when one changed. A branch behind its base stops at the new `behind-base` gate, ahead of a required review. A check rollup cursor that does not advance is a query failure, a missing `gh` exits 7 with a JSON verdict, and a PR whose head is the default branch is in no stack.

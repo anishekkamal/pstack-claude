@@ -42,6 +42,11 @@ const rules = [
     phrase: "an uncommitted `todo.md` Markdown checklist",
   },
   {
+    source: "#229 parallel sessions keep separate todolists",
+    file: "poteto-mode/SKILL.md",
+    phrase: "When several sessions share the checkout, name it `.audit/<task-slug>.todo.md`",
+  },
+  {
     source: "#58 stop before you re-delegate",
     file: "poteto-mode/SKILL.md",
     phrase: "Stop the abandoned agent first, and confirm it stopped.",
@@ -50,6 +55,11 @@ const rules = [
     source: "#58 delegate isolation",
     file: "poteto-mode/playbooks/feature.md",
     phrase: "Give every file-writing delegate its own worktree",
+  },
+  {
+    source: "#228 delegate worktree starts from the branch",
+    file: "poteto-mode/playbooks/feature.md",
+    phrase: "create its worktree with `git worktree add <path> -b <delegate-branch> HEAD`",
   },
   {
     source: "#59 item 1 drain the roster",
@@ -120,6 +130,16 @@ const rules = [
     source: "#188 a missing reviewer blocks the gate",
     file: "poteto-mode/SKILL.md",
     phrase: "Record `BLOCKED: independent review` in the todolist",
+  },
+  {
+    source: "#231 reflect digest carries no verdict",
+    file: "reflect/SKILL.md",
+    phrase: "It states no diagnosis, verdict, or cause.",
+  },
+  {
+    source: "#231 reflect adds nothing beside the transcript path",
+    file: "reflect/SKILL.md",
+    phrase: "Add nothing beside a transcript path",
   },
 ];
 
