@@ -17,6 +17,5 @@ plugins/pstack/skills/poteto-mode/scripts/node_modules/
 # bun installs the typebox peer for the Pi extension tests
 /node_modules/
 
-# npm deps if someone installs Playwright beside the verify-web harness (control setup prefers ~/.claude/verify-web)
-plugins/pstack/skills/verify-web/scripts/node_modules/
-plugins/pstack/skills/verify-web/scripts/package-lock.json
+# Lake build output for the Lean models
+/lean/.lake/
