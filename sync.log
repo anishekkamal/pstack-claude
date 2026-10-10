@@ -1,71 +1,35 @@
-upstream moved: 8 commit(s), ..60ae9e2
+upstream moved: 4 commit(s), ..24c96b1
 Auto-merging .claude-plugin/marketplace.json
-Auto-merging .gitignore
 Auto-merging package.json
 Auto-merging plugins/pstack/.claude-plugin/plugin.json
 Auto-merging plugins/pstack/.codex-plugin/plugin.json
-Auto-merging tests/worktree-audit.test.mjs
-Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
- .claude-plugin/marketplace.json                    |    2 +-
- .gitignore                                         |    5 +-
- CHANGES.md                                         |   18 +-
- VERSION                                            |    2 +-
- lean/Model/WatchPoll.lean                          | 1082 ++++++++
- lean/Model/WatchPoll.mutations                     |  103 +
- lean/Model/WatchPoll.statements                    | 2758 ++++++++++++++++++++
- lean/lake-manifest.json                            |    6 +
- lean/lakefile.toml                                 |    6 +
- lean/lean-toolchain                                |    1 +
- package.json                                       |    4 +-
- plugins/pstack/.claude-plugin/plugin.json          |    4 +-
- plugins/pstack/.codex-plugin/plugin.json           |    4 +-
- plugins/pstack/.github/plugin/plugin.json          |    2 +-
- plugins/pstack/pi/agents.ts                        |   66 +-
- plugins/pstack/pi/schedule.ts                      |   17 +-
- plugins/pstack/skills/poteto-help/SKILL.md         |    2 +-
- .../skills/poteto-mode/references/pi-tools.md      |    2 +-
- .../skills/poteto-mode/scripts/orch/orch.test.ts   |   34 +
- .../skills/poteto-mode/scripts/orch/store.ts       |   52 +-
- .../poteto-mode/scripts/watch-pr/cli.test.ts       |   12 +
- .../skills/poteto-mode/scripts/watch-pr/cli.ts     |   11 +-
- .../scripts/watch-pr/shipping-cli.test.ts          |   17 +-
- .../scripts/watch-pr/shipping.test-helper.ts       |   48 +
- .../poteto-mode/scripts/watch-pr/shipping.test.ts  |   27 +-
- .../poteto-mode/scripts/watch-pr/shipping.ts       |    2 +-
- .../skills/poteto-mode/scripts/worktree-audit.mjs  |   12 +-
- tests/pi/agents-session.test.mjs                   |   59 +-
- tests/pi/interaction.test.mjs                      |   31 +-
- tests/sync.test.mjs                                |    5 +
- tests/worktree-audit.test.mjs                      |   38 +-
- tla/OrchStoreLock.matrix                           |   84 +
- tla/OrchStoreLock.mutations                        |  119 +
- tla/OrchStoreLock.tla                              |  351 +++
- tla/PiScheduler.matrix                             |   70 +
- tla/PiScheduler.mutations                          |  127 +
- tla/PiScheduler.tla                                |  343 +++
- tools/forks.json                                   |    8 +-
- tools/substitutions.json                           |    2 +-
- 39 files changed, 5430 insertions(+), 106 deletions(-)
- create mode 100644 lean/Model/WatchPoll.lean
- create mode 100644 lean/Model/WatchPoll.mutations
- create mode 100644 lean/Model/WatchPoll.statements
- create mode 100644 lean/lake-manifest.json
- create mode 100644 lean/lakefile.toml
- create mode 100644 lean/lean-toolchain
- create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/shipping.test-helper.ts
- create mode 100644 tla/OrchStoreLock.matrix
- create mode 100644 tla/OrchStoreLock.mutations
- create mode 100644 tla/OrchStoreLock.tla
- create mode 100644 tla/PiScheduler.matrix
- create mode 100644 tla/PiScheduler.mutations
- create mode 100644 tla/PiScheduler.tla
-fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json, .gitignore
+ .claude-plugin/marketplace.json                    |   2 +-
+ CHANGES.md                                         |  12 +++
+ VERSION                                            |   2 +-
+ package.json                                       |   4 +-
+ plugins/pstack/.claude-plugin/plugin.json          |   4 +-
+ plugins/pstack/.codex-plugin/plugin.json           |   4 +-
+ plugins/pstack/.github/plugin/plugin.json          |   2 +-
+ plugins/pstack/pi/agents.ts                        |  27 ++++--
+ plugins/pstack/pi/child.ts                         |  13 ++-
+ .../scripts/watch-pr/fakes.test-helper.ts          |  10 +-
+ .../poteto-mode/scripts/watch-pr/github.test.ts    |  40 ++++++--
+ .../skills/poteto-mode/scripts/watch-pr/github.ts  | 102 ++++++++++++---------
+ .../poteto-mode/scripts/watch-pr/integrity.test.ts |  42 +++++++--
+ .../skills/poteto-mode/scripts/watch-pr/landing.ts |  15 ++-
+ .../scripts/watch-pr/shipping-cli.test.ts          |  37 +++++++-
+ .../poteto-mode/scripts/watch-pr/shipping.test.ts  |  81 +++++++++++++++-
+ .../poteto-mode/scripts/watch-pr/shipping.ts       |  18 +++-
+ .../poteto-mode/scripts/watch-pr/transport.test.ts |   4 +-
+ tests/pi/agents-session.test.mjs                   |  55 ++++++++++-
+ 19 files changed, 378 insertions(+), 96 deletions(-)
+fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [106.00ms]
+1 package installed [116.00ms]
 ok: 83 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: 83 generated files current
