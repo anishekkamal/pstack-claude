@@ -35,6 +35,10 @@ if ! git merge --no-edit -X theirs upstream/main -m "Sync upstream port $up ($co
   exit 2
 fi
 
+# GITHUB_TOKEN may not push workflow edits, so the fork keeps its own .github/workflows.
+git restore --source=HEAD^1 --staged --worktree --no-overlay -- .github/workflows
+git diff --cached --quiet || git commit -q --amend --no-edit
+
 node tools/fork-overlay.mjs
 bun install --frozen-lockfile
 bun tools/generate.mjs
