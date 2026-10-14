@@ -1,8 +1,8 @@
 {
   "name": "pstack",
   "displayName": "pstack (Claude Code port)",
-  "version": "0.9.81",
-  "description": "If you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence. Ported from cursor/plugins/pstack to Claude Code. Original pstack by Lauren Tan (poteto). This fork adds the verify-web harness. Port by Michael Denyer.",
+  "version": "0.9.84",
+  "description": "If you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence. Ported from cursor/plugins/pstack to Claude Code. Original pstack by Lauren Tan (poteto).",
   "author": {
     "name": "Anishek Kamal",
     "url": "https://github.com/anishekkamal"
@@ -34,6 +34,8 @@
   "agents": [
     "./agents/comment-sicko.md",
     "./agents/poteto-agent.md",
+    "./agents/thermo-nuclear-code-quality-review-subagent.md",
+    "./agents/thermo-nuclear-review-subagent.md",
     "./effort-agents/effort-high.md",
     "./effort-agents/effort-low.md",
     "./effort-agents/effort-max.md",
