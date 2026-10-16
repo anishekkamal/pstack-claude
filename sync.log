@@ -1,17 +1,106 @@
-upstream moved: 1 commit(s), ..5f07f5e
+upstream moved: 2 commit(s), ..1dba27e
+Auto-merging .claude-plugin/marketplace.json
+Auto-merging docs/reference.md
+Auto-merging package.json
+Auto-merging plugins/pstack/.claude-plugin/plugin.json
+Auto-merging plugins/pstack/.codex-plugin/plugin.json
+Auto-merging plugins/pstack/skills/poteto-mode/SKILL.md
+Auto-merging plugins/pstack/skills/poteto-mode/references/codex-tools.md
+Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
- .github/pull_request_template.md | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
- create mode 100644 .github/pull_request_template.md
-fork overlay: nothing to change
+ .claude-plugin/marketplace.json                    |   2 +-
+ CHANGES.md                                         |  20 +
+ NOTICE.md                                          |   2 +
+ VERSION                                            |   2 +-
+ assets/pstack-overview.png                         | Bin 1313954 -> 1290288 bytes
+ docs/pi-equivalence.md                             |   1 -
+ docs/reference.md                                  |   9 +-
+ package.json                                       |   4 +-
+ plugins/pstack/.claude-plugin/icon.png             | Bin 977799 -> 955906 bytes
+ plugins/pstack/.claude-plugin/plugin.json          |   4 +-
+ plugins/pstack/.codex-plugin/plugin.json           |   4 +-
+ .../.codex-plugin/prompts/in-your-own-words.md     |   7 +
+ plugins/pstack/.codex-plugin/prompts/sharpen.md    |   7 +
+ plugins/pstack/.github/plugin/plugin.json          |   2 +-
+ plugins/pstack/agents/poteto-agent.md              |   2 +-
+ plugins/pstack/assets/pstack-icon.png              | Bin 977799 -> 955906 bytes
+ plugins/pstack/effort-agents/poteto-agent-high.md  |   2 +-
+ plugins/pstack/effort-agents/poteto-agent-low.md   |   2 +-
+ plugins/pstack/effort-agents/poteto-agent-max.md   |   2 +-
+ .../pstack/effort-agents/poteto-agent-medium.md    |   2 +-
+ plugins/pstack/effort-agents/poteto-agent-xhigh.md |   2 +-
+ plugins/pstack/skills/arena/SKILL.md               |   2 +-
+ plugins/pstack/skills/automate-me/SKILL.md         |   2 +-
+ plugins/pstack/skills/correct/SKILL.md             |   2 +-
+ plugins/pstack/skills/figure-it-out/SKILL.md       |   2 +-
+ plugins/pstack/skills/how/SKILL.md                 |   2 +-
+ plugins/pstack/skills/in-your-own-words/SKILL.md   |   6 +
+ plugins/pstack/skills/interrogate/SKILL.md         |   2 +-
+ .../skills/interrogate/references/lead-judgment.md |  19 -
+ plugins/pstack/skills/ketchup/SKILL.md             |  28 +-
+ plugins/pstack/skills/no-comments/SKILL.md         |   2 +-
+ plugins/pstack/skills/poteto-help/SKILL.md         |   4 +-
+ .../skills/poteto-help/references/recipes.md       |   2 +
+ plugins/pstack/skills/poteto-mode/SKILL.md         |  10 +-
+ .../skills/poteto-mode/playbooks/autonomous-run.md |   2 +-
+ .../skills/poteto-mode/playbooks/autopilot-full.md |  34 +-
+ .../poteto-mode/playbooks/autopilot-stack.md       |  16 +-
+ .../pstack/skills/poteto-mode/playbooks/bug-fix.md |   2 +-
+ .../pstack/skills/poteto-mode/playbooks/eval.md    |   2 +-
+ .../pstack/skills/poteto-mode/playbooks/feature.md |   2 +-
+ .../skills/poteto-mode/playbooks/hillclimb.md      |   2 +-
+ .../poteto-mode/playbooks/multi-phase-plan.md      |   6 +-
+ .../skills/poteto-mode/playbooks/opening-a-pr.md   |   2 +-
+ .../skills/poteto-mode/playbooks/orchestrate.md    |  15 +-
+ .../skills/poteto-mode/playbooks/perf-issue.md     |   2 +-
+ .../skills/poteto-mode/playbooks/refactoring.md    |   2 +-
+ .../poteto-mode/playbooks/runtime-forensics.md     |   2 +-
+ .../skills/poteto-mode/playbooks/session-pickup.md |   2 +-
+ .../skills/poteto-mode/playbooks/shipping.md       |  23 +-
+ .../poteto-mode/playbooks/trace-forensics.md       |   2 +-
+ .../poteto-mode/playbooks/worktree-cleanup.md      |   2 +-
+ .../skills/poteto-mode/references/codex-tools.md   |   2 +-
+ .../skills/poteto-mode/references/copilot-tools.md |   4 +-
+ .../skills/poteto-mode/references/pi-tools.md      |   2 +-
+ .../skills/poteto-mode/scripts/orch/orch.test.ts   | 598 ++++++++++++++-------
+ .../pstack/skills/poteto-mode/scripts/orch/orch.ts |  16 +-
+ .../skills/poteto-mode/scripts/orch/store.ts       | 582 +++++++++++++-------
+ .../poteto-mode/scripts/watch-pr/github.test.ts    |  31 ++
+ .../skills/poteto-mode/scripts/watch-pr/github.ts  |  32 +-
+ .../skills/principle-attack-the-premise/SKILL.md   |  15 +-
+ .../skills/principle-fix-root-causes/SKILL.md      |  24 +-
+ .../principle-make-operations-idempotent/SKILL.md  |  10 +-
+ .../SKILL.md                                       |   8 -
+ .../SKILL.md                                       |  19 +-
+ .../principle-type-system-discipline/SKILL.md      |   7 +-
+ plugins/pstack/skills/recall/SKILL.md              |   2 +-
+ plugins/pstack/skills/reflect/SKILL.md             |   2 +-
+ plugins/pstack/skills/sharpen/SKILL.md             |   6 +
+ plugins/pstack/skills/show-me-your-work/SKILL.md   |   2 +-
+ plugins/pstack/skills/swarm/SKILL.md               |   7 +-
+ plugins/pstack/skills/why/SKILL.md                 |   2 +-
+ tests/image-metadata.test.mjs                      |  28 +
+ tests/pi-equivalence.test.mjs                      |   2 +-
+ tests/skill-rules.test.mjs                         |   2 +-
+ tests/sync.test.mjs                                |   5 +
+ tools/forks.json                                   |  16 +-
+ tools/substitutions.json                           | 133 ++++-
+ tools/upstream.json                                |   2 +-
+ 78 files changed, 1244 insertions(+), 592 deletions(-)
+ create mode 100644 plugins/pstack/.codex-plugin/prompts/in-your-own-words.md
+ create mode 100644 plugins/pstack/.codex-plugin/prompts/sharpen.md
+ create mode 100644 plugins/pstack/skills/in-your-own-words/SKILL.md
+ create mode 100644 plugins/pstack/skills/sharpen/SKILL.md
+ create mode 100644 tests/image-metadata.test.mjs
+fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json, docs/reference.md
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [118.00ms]
-ok: 83 generated files current
+1 package installed [129.00ms]
+ok: 90 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
-ok: 83 generated files current
+ok: 90 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: local markdown links stay inside plugins/pstack/skills
 ok: no prose in plugins/pstack/skills points at a path outside it
