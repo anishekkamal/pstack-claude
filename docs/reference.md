@@ -62,10 +62,10 @@ All runtimes share [one skills tree](../plugins/pstack/skills/). A skills-only i
 | Pi | Install the repository as a Pi package with `pi install`. The [Pi extension](../plugins/pstack/pi/index.ts) registers the subagent, question, and wake-up tools and `/loop`, and the [Pi mapping](../plugins/pstack/skills/poteto-mode/references/pi-tools.md) translates Claude tools and model names. The [equivalence table](pi-equivalence.md) records each Claude Code mechanism and how it was verified on Pi 1.1. |
 | GitHub Copilot | Install the plugin through the repository's marketplace; the CLI and the GitHub Copilot app share it. The [Copilot mapping](../plugins/pstack/skills/poteto-mode/references/copilot-tools.md) translates Claude tools, paths, and model roles, and maps app-only tools to CLI fallbacks. Install, routing, agent dispatch, and first-run setup are smoke-tested on the CLI; see [GitHub Copilot](#github-copilot). |
 | Prime Agent | Its documentation describes shared-directory discovery; it has not been tested in a live session. Choose tools and models through Prime's configuration. |
-| opencode | Discovery and reading a linked skill were verified on version 1.18.25. Configure agents, commands, and permissions in `opencode.json`. Its picker also lists principle skills. |
+| opencode | Verified on version 2.0.30: discovery and skill loading in the CLI and the desktop app, and delegation through its `subagent` tool in the CLI. Configure agents, commands, and permissions in `opencode.json`. Its picker also lists principle skills. |
 | Gemini CLI | Its documentation describes shared-directory discovery; it has not been tested in a live session. Use `/skills list` to check discovery and `/skills reload` after changes. |
 
-These checks cover skill discovery. Delegation and multi-model workflows remain unverified on Prime Agent, opencode, and Gemini CLI. On those runtimes, agents must adapt Claude-specific tools, models, and configuration. Each mapping applies only to its runtime.
+These checks cover skill discovery. Delegation remains unverified on Prime Agent and Gemini CLI, and multi-model workflows on all three. On those runtimes, agents must adapt Claude-specific tools, models, and configuration. Each mapping applies only to its runtime.
 
 ### Automatic routing
 
@@ -83,17 +83,7 @@ Skills-only installs and other runtimes do not include the hook or the Pi extens
 
 ### Shared skills installation
 
-Use this path for Prime Agent, opencode, Gemini CLI, or a skills-only Codex installation. Clone the repository and link its skills into `~/.agents/skills/`:
-
-```shell
-git clone https://github.com/anishekkamal/pstack-claude
-cd pstack-claude
-mkdir -p ~/.agents/skills
-for s in plugins/pstack/skills/*/; do
-  target=~/.agents/skills/"$(basename "$s")"
-  test -e "$target" || test -L "$target" || ln -s "$(pwd)/$s" "$target"
-done
-```
+Use this path for Prime Agent, opencode, Gemini CLI, or a skills-only Codex installation. Run the script under [Other harnesses](../README.md#other-harnesses) in the README, which clones the repository and links its skills into `~/.agents/skills/`.
 
 Keep all skill directories, including the principle references. Leave the clone at this path while the links are installed.
 
@@ -101,7 +91,7 @@ Keep all skill directories, including the principle references. Leave the clone 
 
 If a destination already exists, inspect it before replacing it. The installation skips existing files, directories, and links.
 
-To update, pull changes in the clone that the links point to. To uninstall a linked skill, remove its link at `~/.agents/skills/<name>`. This removes it from every runtime using that directory.
+To update, run `git pull` in the clone that the links point to, then run the install loop again. A pull updates skills that are already linked but does not link new skill directories. To uninstall a linked skill, remove its link at `~/.agents/skills/<name>`. This removes it from every runtime using that directory.
 
 ### Install with the skills CLI
 
@@ -149,7 +139,7 @@ The repository root is a [Pi package](https://pi.dev/packages): its [`package.js
 The extension supplies what Pi lacks natively, under the Claude Code names the skills use:
 
 - `agent` dispatches a child `pi --mode rpc` process with the skill's `subagent_type`, model, and effort, in the foreground or background, optionally in its own git worktree. A background agent's completion joins the running turn after its current tool calls, or starts a turn when the session is idle.
-- `send_message`, `list_agents`, and `stop_agent` message, list, and stop those agents. A message to a running agent is an RPC `steer` on the child's stdin, which the agent reads after its current tool calls before it carries on in the same run. A finished agent resumes with the message. An agent's status follows its process.
+- `send_message`, `list_agents`, and `stop_agent` message, list, and stop those agents. A message to a running agent is an RPC `steer` on the child's stdin, which the agent reads after its current tool calls before it carries on in the same run. A finished agent resumes with the message. An agent's status follows its process. `list_agents`, a foreground agent's result, and each completion notice name the child's transcript, `<timestamp>_<session id>.jsonl` under `<agent dir>/pstack/<parent session id>/agents/`, so a user can follow a running agent with `tail -f` or render a finished one with `pi --export`. A running agent's `list_agents` entry also carries `activity`, its current or last tool call and its latest message, read from the child's RPC events and kept in memory, so the model sees it only in a `list_agents` result. The top-level session shows the count and the most recently active agent in a `pstack-agents` footer line, and the user can run `/pstack-agents` for a per-agent view that is not sent to the model.
 - `ask_user_question` and `schedule_wakeup` match `AskUserQuestion` and `ScheduleWakeup`, and `/loop` matches the `loop` skill. In a child agent, asking a question and scheduling a wakeup both return an error.
 - At every agent start it adds the routing instruction, the override sheet `~/.pi/agent/pstack-models.md`, and a pointer to the Pi mapping to the system prompt.
 
