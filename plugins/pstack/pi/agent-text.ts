@@ -70,6 +70,8 @@ export function statusText(running: { id: string; at: string; activity?: Activit
   return `pstack: ${running.length} running${doing ? ` · ${latest.id.slice(0, 8)} ${doing}` : ""}`;
 }
 
+const shellPath = (path: string) => /^[A-Za-z0-9_./-]+$/.test(path) ? path : `'${path.replaceAll("'", "'\\''")}'`;
+
 // What /pstack-agents shows the user: one block per agent.
 export function agentsReport(records: AgentRecord[], { transcriptOf, activityOf }: Lookups): string {
   if (!records.length) return "No pstack agents in this session.";
@@ -80,7 +82,7 @@ export function agentsReport(records: AgentRecord[], { transcriptOf, activityOf 
       if (activity?.tool) lines.push(`${activity.tool.running ? "now" : "last"}: ${toolLine(activity.tool)}`);
       if (activity?.said) lines.push(`said: ${activity.said}`);
       const transcript = transcriptOf(agent);
-      if (transcript) lines.push(`transcript: ${transcript}`, `read it: ${status === "running" ? "tail -f" : "pi --export"} ${transcript}`);
+      if (transcript) lines.push(`transcript: ${transcript}`, `read it: ${status === "running" ? "tail -f" : "pi --export"} ${shellPath(transcript)}`);
       else lines.push("transcript: not written yet");
       return lines.join("\n");
     })
