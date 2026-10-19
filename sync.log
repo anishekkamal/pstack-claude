@@ -1,34 +1,14 @@
-upstream moved: 6 commit(s), ..046341e
-Auto-merging .claude-plugin/marketplace.json
-Auto-merging package.json
-Auto-merging plugins/pstack/.claude-plugin/plugin.json
-Auto-merging plugins/pstack/.codex-plugin/plugin.json
-Auto-merging tools/forks.json
+upstream moved: 1 commit(s), ..3cff27a
+Auto-merging README.md
 Merge made by the 'ort' strategy.
- .claude-plugin/marketplace.json                    |   2 +-
- CHANGES.md                                         |  12 +++
- VERSION                                            |   2 +-
- package.json                                       |   4 +-
- plugins/pstack/.claude-plugin/plugin.json          |   4 +-
- plugins/pstack/.codex-plugin/plugin.json           |   4 +-
- plugins/pstack/.github/plugin/plugin.json          |   2 +-
- plugins/pstack/pi/agent-text.ts                    |   4 +-
- plugins/pstack/pi/worktree.ts                      |   3 +-
- .../skills/poteto-mode/scripts/orch/orch.test.ts   |  37 ++++++-
- .../skills/poteto-mode/scripts/orch/store.ts       |  16 ++-
- .../skills/principle-build-the-lever/SKILL.md      |   1 +
- tests/pi/agent-transcript-command.test.mjs         |  54 +++++++++++
- tests/pi/worktree-status-config.test.mjs           | 108 +++++++++++++++++++++
- tools/forks.json                                   |   6 ++
- 15 files changed, 241 insertions(+), 18 deletions(-)
- create mode 100644 tests/pi/agent-transcript-command.test.mjs
- create mode 100644 tests/pi/worktree-status-config.test.mjs
-fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
+ README.md | 33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
+fork overlay: nothing to change
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [86.00ms]
+1 package installed [121.00ms]
 ok: 90 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: 90 generated files current
