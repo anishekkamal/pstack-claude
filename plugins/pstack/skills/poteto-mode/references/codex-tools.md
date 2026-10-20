@@ -85,6 +85,8 @@ Affected skill entry points and the optional Codex slash stubs point here. Most 
 | `create-verification-skill` | The generated skill lands under `.claude/skills/verify/` on Claude Code; write it to Codex's project-skill location instead. The app-driving harness is platform-neutral. |
 | `verify-web` | The harness is a Node CLI; invoke `scripts/control` through `shell`. `control init` writes the project skill under `.claude/skills/verify/` for Claude Code; pass `--root` and copy the result to Codex's project-skill location, and set `VERIFY_PROJECT_DIR` to it when the CLI cannot find it by walking up from the working directory. |
 | `maintain-verification-skill` | The parallel per-feature source readers map to `spawn_agent` fan-out; the project-local skill lives under Codex's skills location, not `.claude/skills/`. |
+| `create-formal-verification-skill` | Write the generated skill to Codex's project-skill location, named for the area it verifies. The verifier and its run command are platform-neutral. |
+| `maintain-formal-verification-skill` | Project skills, the formal verification skill among them, live under Codex's project-skill location. |
 | `babysit` | `loop` and `AskUserQuestion` resolve through the tables above. |
 | `automate-me` | `plugin-dev:skill-development` resolves through the skills table above. |
 | `architect` | The runner panel goes through the **arena** skill, so its `spawn_agent` fan-out and model substitution apply here too. |
