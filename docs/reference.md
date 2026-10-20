@@ -4,7 +4,7 @@ Start with the [README](../README.md) for installation and your first task.
 
 ## Slash commands
 
-The package includes 65 skill directories: 41 public skills and 24 `principle-*` references. Claude Code uses `/pstack:<name>`, and Pi uses `/skill:<name>`. In Codex, request a skill by name or install the [optional shortcuts](#codex) for the `/name` form below.
+The package includes 66 skill directories: 42 public skills and 24 `principle-*` references. Claude Code uses `/pstack:<name>`, and Pi uses `/skill:<name>`. In Codex, request a skill by name or install the [optional shortcuts](#codex) for the `/name` form below.
 
 Find each skill's instructions in the [skills tree](../plugins/pstack/skills/).
 
@@ -38,6 +38,7 @@ Find each skill's instructions in the [skills tree](../plugins/pstack/skills/).
 | `/unslop` | clean up writing by removing AI tells |
 | `/no-comments` | strip comments before review, fix the accepted findings, encode claimed constraints |
 | `/create-verification-skill` | generate a project-local verification skill and feature map |
+| `/verify-web` | drive the running web app over Chrome DevTools Protocol, capture evidence and perf captures, return a verdict; `control init` sets a repo up |
 | `/maintain-verification-skill` | re-sync a drifted verification skill and its feature map |
 | `/create-formal-verification-skill` | generate a project-local skill that formally verifies one high-risk property |
 | `/maintain-formal-verification-skill` | re-sync a formal verification after the code it covers changed |
