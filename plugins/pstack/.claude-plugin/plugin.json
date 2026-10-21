@@ -1,8 +1,8 @@
 {
   "name": "pstack",
   "displayName": "pstack (Claude Code port)",
-  "version": "0.9.94",
-  "description": "If you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence. Ported from cursor/plugins/pstack to Claude Code. Original pstack by Lauren Tan (poteto). This fork adds the verify-web harness. Port by Michael Denyer.",
+  "version": "0.9.97",
+  "description": "If you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence. Ported from cursor/plugins/pstack to Claude Code. Original pstack by Lauren Tan (poteto).",
   "author": {
     "name": "Anishek Kamal",
     "url": "https://github.com/anishekkamal"
@@ -26,27 +26,6 @@
     "codex",
     "opencode",
     "gemini-cli",
-    "prime-agent",
-    "verification",
-    "chrome-devtools-protocol",
-    "playwright"
-  ],
-  "agents": [
-    "./agents/comment-sicko.md",
-    "./agents/poteto-agent.md",
-    "./agents/thermo-nuclear-code-quality-review-subagent.md",
-    "./agents/thermo-nuclear-review-subagent.md",
-    "./effort-agents/effort-high.md",
-    "./effort-agents/effort-low.md",
-    "./effort-agents/effort-max.md",
-    "./effort-agents/effort-medium.md",
-    "./effort-agents/effort-xhigh.md",
-    "./effort-agents/poteto-agent-high.md",
-    "./effort-agents/poteto-agent-low.md",
-    "./effort-agents/poteto-agent-max.md",
-    "./effort-agents/poteto-agent-medium.md",
-    "./effort-agents/poteto-agent-xhigh.md"
-  ],
-  "documentationUrl": "https://github.com/anishekkamal/pstack-claude/blob/main/docs/reference.md",
-  "supportUrl": "https://github.com/anishekkamal/pstack-claude/issues"
+    "prime-agent"
+  ]
 }
