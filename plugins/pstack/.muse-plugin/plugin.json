@@ -326,6 +326,11 @@
         "enabledDefault": true
       },
       {
+        "id": "verify-web",
+        "path": "skills/verify-web/SKILL.md",
+        "enabledDefault": true
+      },
+      {
         "id": "what-did-i-get-done",
         "path": "skills/what-did-i-get-done/SKILL.md",
         "enabledDefault": true
