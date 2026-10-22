@@ -33,7 +33,7 @@ mappingCoverage(RUNTIMES.find((runtime) => runtime.name === "GitHub Copilot"), [
   ["`loop`", "`loop`"],
   ["/loop", "`/loop`"],
   ["plugin-dev", "`plugin-dev:skill-development`"],
-  [".claude/projects", "`~/.claude/projects/"],
+  ["${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects", "`${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects/"],
   [".claude/skills", "`.claude/skills/`"],
   ["~/.claude/orchestrate", "`~/.claude/orchestrate/`"],
   ["CLAUDE.md", "`CLAUDE.md`"],
