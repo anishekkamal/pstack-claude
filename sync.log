@@ -1,117 +1,53 @@
-upstream moved: 3 commit(s), ..a369e70
+upstream moved: 4 commit(s), ..903e738
 Auto-merging .claude-plugin/marketplace.json
-Auto-merging README.md
-Auto-merging docs/reference.md
 Auto-merging package.json
 Auto-merging plugins/pstack/.claude-plugin/plugin.json
 Auto-merging plugins/pstack/.codex-plugin/plugin.json
-Auto-merging plugins/pstack/skills/create-verification-skill/SKILL.md
-Auto-merging plugins/pstack/skills/poteto-mode/SKILL.md
+Auto-merging plugins/pstack/.muse-plugin/plugin.json
 Auto-merging plugins/pstack/skills/poteto-mode/references/codex-tools.md
 Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
  .claude-plugin/marketplace.json                    |   2 +-
- .github/ISSUE_TEMPLATE/bug_report.yml              |   2 +-
- CHANGES.md                                         |  16 +
- CONTEXT.md                                         |   2 +-
- CONTRIBUTING.md                                    |   4 +-
- README.md                                          |  22 +-
+ CHANGES.md                                         |  36 +++++
  VERSION                                            |   2 +-
- docs/pi-equivalence.md                             |   8 +-
- docs/reference.md                                  |  28 +-
+ docs/pi-equivalence.md                             |   6 +-
  package.json                                       |   4 +-
- plugins/pstack/.claude-plugin/plugin.json          |  29 +-
+ plugins/pstack/.claude-plugin/plugin.json          |   4 +-
  plugins/pstack/.codex-plugin/plugin.json           |   4 +-
  plugins/pstack/.github/plugin/plugin.json          |   2 +-
- plugins/pstack/.muse-plugin/plugin.json            | 356 +++++++++++++++++++++
- plugins/pstack/README.md                           |   2 +-
- plugins/pstack/effort-agents/effort-high.md        |   9 -
- plugins/pstack/effort-agents/effort-low.md         |   9 -
- plugins/pstack/effort-agents/effort-max.md         |   9 -
- plugins/pstack/effort-agents/effort-medium.md      |   9 -
- plugins/pstack/effort-agents/effort-xhigh.md       |   9 -
- plugins/pstack/effort-agents/poteto-agent-high.md  |   9 -
- plugins/pstack/effort-agents/poteto-agent-low.md   |   9 -
- plugins/pstack/effort-agents/poteto-agent-max.md   |   9 -
- .../pstack/effort-agents/poteto-agent-medium.md    |   9 -
- plugins/pstack/effort-agents/poteto-agent-xhigh.md |   9 -
- plugins/pstack/hooks/copilot-context.awk           |   5 +-
- plugins/pstack/hooks/muse-context.awk              |  31 ++
- plugins/pstack/hooks/session-start-muse-sheet.md   |   1 +
- plugins/pstack/hooks/session-start-muse.md         |  17 +
- plugins/pstack/hooks/session-start.sh              |  21 +-
- plugins/pstack/models.json                         |   6 +
- plugins/pstack/pi/agent-tools.ts                   |   8 +-
- plugins/pstack/pi/agents.ts                        |   7 +-
- plugins/pstack/pi/config.ts                        |  28 +-
- plugins/pstack/skills/architect/SKILL.md           |   4 +-
- plugins/pstack/skills/arena/SKILL.md               |   4 +-
- plugins/pstack/skills/automate-me/SKILL.md         |   2 +
- plugins/pstack/skills/babysit/SKILL.md             |   2 +
- .../create-formal-verification-skill/SKILL.md      |   2 +
- .../skills/create-verification-skill/SKILL.md      |   2 +
- plugins/pstack/skills/how/SKILL.md                 |   4 +-
- plugins/pstack/skills/interrogate/SKILL.md         |   4 +-
- .../maintain-formal-verification-skill/SKILL.md    |   2 +
- .../skills/maintain-verification-skill/SKILL.md    |   2 +
- plugins/pstack/skills/no-comments/SKILL.md         |   2 +
- plugins/pstack/skills/poteto-mode/SKILL.md         |   4 +-
+ plugins/pstack/.muse-plugin/plugin.json            |   2 +-
+ plugins/pstack/agents/poteto-agent.md              |   2 +-
+ plugins/pstack/skills/automate-me/SKILL.md         |   6 +-
+ .../pstack/skills/poteto-mode/playbooks/eval.md    |   2 +-
+ .../skills/poteto-mode/playbooks/session-pickup.md |   2 +-
+ .../poteto-mode/playbooks/worktree-cleanup.md      |   2 +-
  .../skills/poteto-mode/references/codex-tools.md   |   2 +-
- .../skills/poteto-mode/references/copilot-tools.md |   2 +-
- .../skills/poteto-mode/references/muse-tools.md    | 105 ++++++
- .../skills/poteto-mode/references/pi-tools.md      |   4 +-
- plugins/pstack/skills/recall/SKILL.md              |   2 +
- plugins/pstack/skills/reflect/SKILL.md             |   4 +-
- plugins/pstack/skills/setup-pstack/SKILL.md        |  11 +-
- .../pstack/skills/setup-pstack/scripts/sheet.awk   |  23 +-
- plugins/pstack/skills/show-me-your-work/SKILL.md   |   2 +
- plugins/pstack/skills/swarm/SKILL.md               |   4 +-
- plugins/pstack/skills/teach/SKILL.md               |   2 +
- plugins/pstack/skills/thermos/SKILL.md             |   2 +
- .../skills/typescript-best-practices/SKILL.md      |   2 +
- plugins/pstack/skills/why/SKILL.md                 |   4 +-
- tests/agent-roster.test.mjs                        |   6 +-
- tests/copilot.test.mjs                             |  26 +-
- tests/generate.test.mjs                            |  75 ++---
- tests/invariants.test.mjs                          |  14 +-
- tests/mapping-coverage.mjs                         |  32 ++
- tests/models.test.mjs                              |   7 +
- tests/muse.test.mjs                                |  72 +++++
- tests/pi/agents-launch.test.mjs                    |  28 +-
- tests/pi/agents-messages.test.mjs                  |   2 +-
- tests/pi/config.test.mjs                           |  12 +-
- tests/pi/live.test.mjs                             |   8 +-
- tests/runtime-packaging.test.mjs                   |  54 +++-
- tests/session-hook.test.mjs                        | 102 +++++-
- tools/forks.json                                   |   4 +-
- tools/generate.mjs                                 |  95 ++----
- tools/runtimes.mjs                                 | 143 ++++++++-
- tools/substitutions.json                           |   2 +-
- 77 files changed, 1203 insertions(+), 379 deletions(-)
- create mode 100644 plugins/pstack/.muse-plugin/plugin.json
- delete mode 100644 plugins/pstack/effort-agents/effort-high.md
- delete mode 100644 plugins/pstack/effort-agents/effort-low.md
- delete mode 100644 plugins/pstack/effort-agents/effort-max.md
- delete mode 100644 plugins/pstack/effort-agents/effort-medium.md
- delete mode 100644 plugins/pstack/effort-agents/effort-xhigh.md
- delete mode 100644 plugins/pstack/effort-agents/poteto-agent-high.md
- delete mode 100644 plugins/pstack/effort-agents/poteto-agent-low.md
- delete mode 100644 plugins/pstack/effort-agents/poteto-agent-max.md
- delete mode 100644 plugins/pstack/effort-agents/poteto-agent-medium.md
- delete mode 100644 plugins/pstack/effort-agents/poteto-agent-xhigh.md
- create mode 100644 plugins/pstack/hooks/muse-context.awk
- create mode 100644 plugins/pstack/hooks/session-start-muse-sheet.md
- create mode 100644 plugins/pstack/hooks/session-start-muse.md
- create mode 100644 plugins/pstack/skills/poteto-mode/references/muse-tools.md
- create mode 100644 tests/mapping-coverage.mjs
- create mode 100644 tests/muse.test.mjs
-fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json, plugins/pstack/.claude-plugin/plugin.json, docs/reference.md
+ .../skills/poteto-mode/references/copilot-tools.md |  12 +-
+ .../skills/poteto-mode/references/pi-tools.md      |   6 +-
+ plugins/pstack/skills/recall/SKILL.md              |   2 +-
+ plugins/pstack/skills/reflect/SKILL.md             |   8 +-
+ .../reflect/references/divergent-reviewer.md       |   2 +-
+ .../skills/reflect/references/judgment-reviewer.md |   2 +-
+ .../skills/reflect/references/tooling-reviewer.md  |   2 +-
+ .../skills/reflect/scripts/claude-project-dir.mjs  | 115 ++++++++++++++++
+ plugins/pstack/skills/show-me-your-work/SKILL.md   |   2 +-
+ tests/claude-config-dir.test.mjs                   |  53 ++++++++
+ tests/claude-project-dir.test.mjs                  | 146 +++++++++++++++++++++
+ tests/copilot.test.mjs                             |   2 +-
+ tests/sync.test.mjs                                |   8 +-
+ tools/forks.json                                   |   2 +-
+ tools/substitutions.json                           |  25 ++--
+ 30 files changed, 410 insertions(+), 55 deletions(-)
+ create mode 100644 plugins/pstack/skills/reflect/scripts/claude-project-dir.mjs
+ create mode 100644 tests/claude-config-dir.test.mjs
+ create mode 100644 tests/claude-project-dir.test.mjs
+fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [120.00ms]
-write: plugins/pstack/.muse-plugin/plugin.json
+1 package installed [99.00ms]
+ok: 87 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: 87 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
