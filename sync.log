@@ -1,30 +1,116 @@
-upstream moved: 2 commit(s), ..356c6e0
+upstream moved: 2 commit(s), ..36885ea
 Auto-merging .claude-plugin/marketplace.json
+Auto-merging .github/workflows/ci.yml
+Auto-merging README.md
+Auto-merging docs/reference.md
 Auto-merging package.json
 Auto-merging plugins/pstack/.claude-plugin/plugin.json
 Auto-merging plugins/pstack/.codex-plugin/plugin.json
 Auto-merging plugins/pstack/.muse-plugin/plugin.json
+Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
- .claude-plugin/marketplace.json           |  2 +-
- CHANGES.md                                |  4 ++
- VERSION                                   |  2 +-
- package.json                              |  4 +-
- plugins/pstack/.claude-plugin/plugin.json |  4 +-
- plugins/pstack/.codex-plugin/plugin.json  |  4 +-
- plugins/pstack/.github/plugin/plugin.json |  2 +-
- plugins/pstack/.muse-plugin/plugin.json   |  2 +-
- tests/agent-skills.test.mjs               | 81 +++++++++++++++++++++++++++++++
- tools/validate-skills.mjs                 |  6 ++-
- 10 files changed, 100 insertions(+), 11 deletions(-)
-fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
+ .claude-plugin/marketplace.json                    |    2 +-
+ .github/workflows/ci.yml                           |   77 +-
+ CHANGES.md                                         |   16 +
+ CONTRIBUTING.md                                    |    4 +-
+ NOTICE.md                                          |    1 +
+ README.md                                          |    2 +
+ VERSION                                            |    2 +-
+ docs/reference.md                                  |    8 +-
+ package.json                                       |    4 +-
+ plugins/pstack/.claude-plugin/plugin.json          |    4 +-
+ plugins/pstack/.codex-plugin/plugin.json           |    4 +-
+ .../pstack/.codex-plugin/prompts/ketchup-video.md  |    7 +
+ plugins/pstack/.codex-plugin/prompts/sharpen.md    |    2 +-
+ plugins/pstack/.codex-plugin/prompts/statechart.md |    7 +
+ plugins/pstack/.github/plugin/plugin.json          |    2 +-
+ plugins/pstack/.muse-plugin/plugin.json            |   12 +-
+ .../create-formal-verification-skill/SKILL.md      |    2 +
+ plugins/pstack/skills/ketchup-video/SKILL.md       |   22 +
+ plugins/pstack/skills/poteto-help/SKILL.md         |    4 +-
+ .../skills/poteto-help/references/recipes.md       |    2 +-
+ .../skills/poteto-mode/scripts/.prettierignore     |    4 +
+ .../skills/poteto-mode/scripts/check-plan.mjs      |    2 +-
+ .../skills/poteto-mode/scripts/check-plan.test.ts  |   14 +
+ .../skills/poteto-mode/scripts/orch/orch.test.ts   |   34 +
+ .../skills/poteto-mode/scripts/orch/store.ts       |   10 +-
+ .../poteto-mode/scripts/watch-pr/github.test.ts    |   61 +
+ .../poteto-mode/scripts/watch-pr/policy.test.ts    |   61 +
+ plugins/pstack/skills/reflect/SKILL.md             |    2 +
+ plugins/pstack/skills/sharpen/SKILL.md             |   13 +-
+ plugins/pstack/skills/statechart/SKILL.md          |   35 +
+ .../skills/statechart/scripts/bug-states.mjs       |   81 +
+ .../skills/statechart/scripts/chart-edges.mjs      |   68 +
+ .../skills/statechart/scripts/chart-parts.mjs      |   21 +
+ .../skills/statechart/scripts/chart-to-tla.mjs     |  205 +
+ .../skills/statechart/scripts/compare-charts.mjs   |   74 +
+ plugins/pstack/skills/statechart/scripts/lib.mjs   |  970 +++
+ .../pstack/skills/statechart/scripts/map-view.mjs  |   92 +
+ .../skills/statechart/scripts/property-loop.mjs    |   60 +
+ .../skills/statechart/scripts/read-check.mjs       |   79 +
+ .../skills/statechart/scripts/regions-chart.mjs    |  307 +
+ .../pstack/skills/statechart/scripts/render.mjs    |  531 ++
+ .../pstack/skills/statechart/scripts/rule-book.mjs |   84 +
+ .../skills/statechart/scripts/second-replay.mjs    |  122 +
+ .../pstack/skills/statechart/scripts/snapshot.mjs  |   74 +
+ .../pstack/skills/statechart/scripts/spec-text.mjs |  126 +
+ .../skills/statechart/scripts/statechart-help.mjs  |  350 +
+ .../skills/statechart/scripts/statechart.mjs       |  903 +++
+ .../pstack/skills/statechart/scripts/test/band.mmd |   15 +
+ .../skills/statechart/scripts/test/regions.mmd     |   62 +
+ .../statechart/scripts/test/statechart.test.mjs    | 6864 ++++++++++++++++++++
+ .../pstack/skills/statechart/scripts/test/sync.mmd |   19 +
+ .../skills/statechart/scripts/test/upload.mmd      |   16 +
+ .../statechart/scripts/tlc-to-chart-args.mjs       |   52 +
+ .../skills/statechart/scripts/tlc-to-chart.mjs     |  802 +++
+ .../pstack/skills/statechart/scripts/tlc-tools.mjs |   69 +
+ .../pstack/skills/statechart/scripts/ways-in.mjs   |   69 +
+ plugins/pstack/skills/swarm/SKILL.md               |    8 +-
+ tests/sync.test.mjs                                |  103 +-
+ tools/forks.json                                   |    6 +
+ tools/substitutions.json                           |   80 +-
+ tools/sync.mjs                                     |   51 +
+ tools/upstream.json                                |    2 +-
+ 62 files changed, 12653 insertions(+), 132 deletions(-)
+ create mode 100644 plugins/pstack/.codex-plugin/prompts/ketchup-video.md
+ create mode 100644 plugins/pstack/.codex-plugin/prompts/statechart.md
+ create mode 100644 plugins/pstack/skills/ketchup-video/SKILL.md
+ create mode 100644 plugins/pstack/skills/statechart/SKILL.md
+ create mode 100644 plugins/pstack/skills/statechart/scripts/bug-states.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/chart-edges.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/chart-parts.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/chart-to-tla.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/compare-charts.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/lib.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/map-view.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/property-loop.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/read-check.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/regions-chart.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/render.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/rule-book.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/second-replay.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/snapshot.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/spec-text.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/statechart-help.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/statechart.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/test/band.mmd
+ create mode 100644 plugins/pstack/skills/statechart/scripts/test/regions.mmd
+ create mode 100644 plugins/pstack/skills/statechart/scripts/test/statechart.test.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/test/sync.mmd
+ create mode 100644 plugins/pstack/skills/statechart/scripts/test/upload.mmd
+ create mode 100644 plugins/pstack/skills/statechart/scripts/tlc-to-chart-args.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/tlc-to-chart.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/tlc-tools.mjs
+ create mode 100644 plugins/pstack/skills/statechart/scripts/ways-in.mjs
+fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json, docs/reference.md
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [83.00ms]
-ok: 87 generated files current
+1 package installed [91.00ms]
+ok: 89 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
-ok: 87 generated files current
+ok: 89 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: local markdown links stay inside plugins/pstack/skills
 ok: no prose in plugins/pstack/skills points at a path outside it
