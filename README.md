@@ -20,6 +20,8 @@ Run in Claude Code 2.1.292 or later:
 /plugin install pstack@pstack-anishek
 ```
 
+Claude Code leaves auto-update off for third-party marketplaces, so pstack stays on the version you installed. To turn it on, run `/plugin`, open the **Marketplaces** tab, select `pstack-claude`, and choose **Enable auto-update**. To update once by hand, run `claude plugin update pstack@pstack-claude`.
+
 </details>
 
 <a id="codex"></a>

@@ -4,7 +4,7 @@ Start with the [README](../README.md) for installation and your first task.
 
 ## Slash commands
 
-The package includes 66 skill directories: 42 public skills and 24 `principle-*` references. Claude Code uses `/pstack:<name>`, Pi uses `/skill:<name>`, and Muse lists each user-invocable skill as `/<name>`. In Codex, request a skill by name or install the [optional shortcuts](#codex) for the `/name` form below.
+The package includes 67 skill directories: 43 public skills and 24 `principle-*` references. Claude Code uses `/pstack:<name>`, Pi uses `/skill:<name>`, and Muse lists each user-invocable skill as `/<name>`. In Codex, request a skill by name or install the [optional shortcuts](#codex) for the `/name` form below.
 
 Find each skill's instructions in the [skills tree](../plugins/pstack/skills/).
 
@@ -27,12 +27,13 @@ Find each skill's instructions in the [skills tree](../plugins/pstack/skills/).
 | `/technical-writing` | write docs, RFCs, readmes, PR descriptions, and commit messages to one layered standard |
 | `/bro` | restate the last message in plain human language, no jargon |
 | `/in-your-own-words` | play back your goal and the problem before the agent starts |
-| `/sharpen` | aim a task at what you are really after, the way a top expert would, without overspecifying it |
+| `/sharpen` | make a task deeper, not bigger, by naming what a top expert would do and what would show the result is right, then rewrite the prompt to ask for that |
 | `/figure-it-out` | design a rigorous, auditable playbook for a task no bundled playbook fits |
 | `/show-me-your-work` | log decisions to a reviewable tsv decision trail |
 | `/blast-radius` | find what a change could break beyond the diff and prove safety by running code |
 | `/recall` | catch up on recent working context from chat history, live state, and the shared record |
 | `/ketchup` | catch up on everything in this chat since your last message, with an executive summary for each action item |
+| `/ketchup-video` | get the `/ketchup` catch-up as a short silent video of slides, with the calls waiting on you as text under it |
 | `/setup-pstack` | configure pstack per-role model choices |
 | `/poteto-help` | answer a question about pstack with the prompt to send and the file the answer came from |
 | `/unslop` | clean up writing by removing AI tells |
@@ -42,6 +43,7 @@ Find each skill's instructions in the [skills tree](../plugins/pstack/skills/).
 | `/maintain-verification-skill` | re-sync a drifted verification skill and its feature map |
 | `/create-formal-verification-skill` | generate a project-local skill that formally verifies one high-risk property |
 | `/maintain-formal-verification-skill` | re-sync a formal verification after the code it covers changed |
+| `/statechart` | show a behavior as a Mermaid statechart generated from a TLA+ model, with each bug TLC finds as a numbered path, or turn an agreed chart into a TLA+ skeleton |
 | `/deslop` | deslop a diff before commit |
 | `/babysit` | monitor an open PR, fix CI/comments, keep it merge-ready |
 | `/thermo-nuclear-review` | audit a branch's changes for bugs, breakage, security issues, devex regressions, and feature-gate leaks |
@@ -240,7 +242,7 @@ CI also checks shell scripts, workflows, Markdown, relative links, and the bundl
 
 ### Port scope and attribution
 
-The skill tree is synced against upstream `7b353f7` (v0.15.27 and later). The thermos skills and agents are synced against `118e73b` (thermos 1.0.0).
+The skill tree is synced against upstream `e73df47` (v0.15.32). The thermos skills and agents are synced against `118e73b` (thermos 1.0.0).
 
 This repository ports Lauren Tan's pstack from Cursor to Claude Code and shares the skills with other runtimes. It includes six cursor-team-kit skills, the three thermos skills with their two review subagents, and an independently authored `babysit` skill. The port supplies Claude Code plugin registration and routing, Codex manifests and shortcuts, the Codex tool mapping, the Pi package, extension, and tool mapping, the GitHub Copilot hooks and tool mapping, and the Muse native plugin, routing hook, and tool mapping.
 

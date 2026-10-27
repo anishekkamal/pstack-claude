@@ -2,6 +2,22 @@
 
 This file is the release changelog, with one `## <version> - <title>` entry per release, newest first. The Cursor-to-Claude rewrite rules live in [`tools/substitutions.json`](tools/substitutions.json), and the [sync boundary](CONTRIBUTING.md#the-sync-boundary) in `CONTRIBUTING.md` defines how a change to upstream's skill content is declared.
 
+## 0.9.103 - sync to upstream e73df47 (v0.15.32): adds /statechart and /ketchup-video
+
+The upstream pin moves from `7b353f7` to `e73df47`, upstream v0.15.32, 18 pstack commits. `/statechart` draws how a system moves between states as a Mermaid statechart generated from a TLA+ model, with each bug TLC finds as a numbered path, and also turns an agreed chart into a TLA+ skeleton. Its first run installs TLC and Java with mise, about 305 MB. `/ketchup-video` gives the `/ketchup` catch-up as a short silent video of slides, with the waiting calls as text under it. `/create-formal-verification-skill` now tells the skill it generates to read each TLA+ result with `/statechart`, and `/poteto-help` routes to both new skills. The package now carries 43 public skills and 24 principles.
+
+`/sharpen` returns to upstream's original prompt. It names what a top professional would do, their raw material and methods, and an outside check, then rewrites the prompt and does not do the task. `swarm` renumbers its Phase A steps. `reflect` copies a skill out of the plugin cache before it edits it. `check-plan.mjs` matches inline code spans by their delimiter length, so a span opened with two backticks closes at two backticks.
+
+Upstream fixed three bugs in the poteto-mode scripts. The port had already fixed two of them in its own code, so it keeps that code and takes upstream's tests for them. `watch-pr` sleeps no longer run past `--timeout`, because the port's `WatchDeadline` caps every sleep. Stack discovery never makes a fork's head branch the parent of another PR, even when it has the name of a branch in the repository, because the port compares head repositories. Upstream's four fork tests and four deadline tests run against the port's types. The third fix is new to the port: `orch frontier set` prefers a branch's open PR over its closed or merged ones, and still refuses two open PRs on one branch. It applies after the port's filter that keeps only PRs from the repository the branch pushes to.
+
+The README now says that Claude Code leaves auto-update off for third-party marketplaces, and how to turn it on or update once by hand. Upstream's `worktree-audit.sh` fix for GNU `stat` does not apply, because the port excludes that script and runs `worktree-audit.mjs`.
+
+Measured with `bun tools/sync.mjs pstack e73df47`: 83 files unchanged, 38 excluded, 4 updated, 28 added, 5 merged, and 6 conflicts, each resolved by hand as described above. Upstream renumbered the `swarm` step that names the worker model from 4 to 3, so the substitution for that sentence is now two rules that leave the step number out and match either text.
+
+`bun tools/sync.mjs --check-rules` derives every component at its pin and fails naming each substitution rule that matches no upstream file, and the Fork registry CI job runs it. Rules written for an older pin's sentences used to stay after upstream reworded them, because a dry run at the pin writes no file and so prints no substitution counts. The 14 such rules are gone, and `restart Cursor`, the one generic phrase among them, is now on the denylist, so a sync that brings it back fails. (#314)
+
+A new CI job runs `/statechart`'s 150 `node:test` cases with the TLC jar that `TLC_TOOL` pins, checked against its sha256. It gave 146 pass, 4 skip, 0 fail. On macOS the suite had 17 failures, all in the tests. 13 compared paths under `os.tmpdir()`, which macOS keeps under the `/var` symlink, so a child's resolved working directory and the unresolved `TMPDIR` disagreed. 4 injected rename failures through `LD_PRELOAD`, which macOS ignores. The test file now resolves `TMPDIR` first and skips the rename cases outside Linux, a declared policy fork, and the suite gives 140 pass, 10 skip, 0 fail on macOS. (#315)
+
 ## 0.9.102 - The skill link validator keeps angle-bracket destinations
 
 `tools/validate-skills.mjs` now reads a Markdown link destination written in angle brackets, such as `[text](<path with spaces.md>)`, as the path inside the brackets. It used to check the brackets as part of the path, so a link to an existing file was reported as broken. No skill content changed. `tests/agent-skills.test.mjs` covers the case.
