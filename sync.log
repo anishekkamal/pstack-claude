@@ -1,40 +1,36 @@
-upstream moved: 6 commit(s), ..190fc9a
+upstream moved: 2 commit(s), ..22b5e13
 Auto-merging .claude-plugin/marketplace.json
-Auto-merging .github/workflows/ci.yml
-Auto-merging README.md
+Auto-merging docs/reference.md
 Auto-merging package.json
 Auto-merging plugins/pstack/.claude-plugin/plugin.json
 Auto-merging plugins/pstack/.codex-plugin/plugin.json
 Auto-merging plugins/pstack/.muse-plugin/plugin.json
-Auto-merging plugins/pstack/skills/poteto-mode/references/codex-tools.md
-Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
- .claude-plugin/marketplace.json                    |  2 +-
- .github/scripts/statechart-watchdog.sh             | 71 ++++++++++++++++++++++
- .github/workflows/ci.yml                           | 44 ++++++++++++++
- CHANGES.md                                         | 16 +++++
- README.md                                          |  4 ++
- VERSION                                            |  2 +-
- package.json                                       |  4 +-
- plugins/pstack/.claude-plugin/plugin.json          |  4 +-
- plugins/pstack/.codex-plugin/plugin.json           |  4 +-
- plugins/pstack/.github/plugin/plugin.json          |  2 +-
- plugins/pstack/.muse-plugin/plugin.json            |  2 +-
- plugins/pstack/models.json                         | 10 +--
- .../skills/poteto-mode/references/codex-tools.md   |  6 +-
- .../skills/poteto-mode/references/pi-tools.md      |  2 +-
- .../pstack/skills/poteto-mode/scripts/bootstrap.ts |  9 +++
- .../scripts/watch-pr/fresh-install.test.ts         | 36 +++++++++++
- tools/forks.json                                   |  2 +-
- 17 files changed, 200 insertions(+), 20 deletions(-)
- create mode 100644 .github/scripts/statechart-watchdog.sh
- create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/fresh-install.test.ts
+ .claude-plugin/marketplace.json                    |   2 +-
+ CHANGES.md                                         |   8 ++
+ VERSION                                            |   2 +-
+ docs/reference.md                                  |   2 +-
+ package.json                                       |   4 +-
+ plugins/pstack/.claude-plugin/plugin.json          |   4 +-
+ plugins/pstack/.codex-plugin/plugin.json           |   4 +-
+ plugins/pstack/.github/plugin/plugin.json          |   2 +-
+ plugins/pstack/.muse-plugin/plugin.json            |  17 ++-
+ plugins/pstack/hooks/codex-hooks.json              |   2 +-
+ plugins/pstack/hooks/session-start.ps1             | 100 +++++++++++++--
+ plugins/pstack/hooks/session-start.sh              |   6 +
+ .../skills/poteto-mode/references/muse-tools.md    |   2 +-
+ tests/runtime-packaging.test.mjs                   |  23 +++-
+ tests/session-hook-sheets.mjs                      |  49 ++++++++
+ tests/session-hook-windows.test.mjs                | 140 +++++++++++++++++++--
+ tests/session-hook.test.mjs                        |  55 ++++----
+ tools/runtimes.mjs                                 |  36 ++++--
+ 18 files changed, 386 insertions(+), 72 deletions(-)
 fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [121.00ms]
+1 package installed [114.00ms]
 ok: 89 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: 89 generated files current
