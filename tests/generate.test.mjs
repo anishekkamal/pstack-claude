@@ -561,6 +561,11 @@ describe("effort section", () => {
     expect(text).toContain("`reasoning_effort`");
     expect(text).not.toContain("effort-<level>");
   });
+
+  test("session effort outside Claude Code defers to the platform mapping", () => {
+    const text = effortSection(["low", "max"], "session");
+    expect(text).toContain("On other runtimes, follow the platform mapping for `session`");
+  });
 });
 
 describe("plan, changes, apply", () => {

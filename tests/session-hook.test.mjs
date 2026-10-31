@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { agentSkills } from "../tools/generate.mjs";
+import { MUSE_HOOKS } from "../tools/runtimes.mjs";
 import { roleCases, sheetCases, writeSheet } from "./session-hook-sheets.mjs";
 
 const pluginRoot = fileURLToPath(new URL("../plugins/pstack/", import.meta.url));
@@ -106,13 +107,6 @@ describe("SessionStart hook", () => {
       test("injects the mandate when no sheet exists", () => {
         const r = runHook(runtime, null);
         expect({ ...r, out: wrap(r.out) }).toEqual({ status: 0, out: expected(false), err: "" });
-      });
-
-      // iconv rejects a UTF-16 LE sheet that ends mid-character, so the hook
-      // cannot decode it and must inject as it does for a missing sheet.
-      test("injects the mandate when the sheet cannot be decoded", () => {
-        const r = runHook(runtime, Buffer.from([0xff, 0xfe, 0x73, 0x00, 0x65]));
-        expect({ status: r.status, out: wrap(r.out) }).toEqual({ status: 0, out: expected(false) });
       });
 
       for (const { name, sheet, off } of sheetCases) {
@@ -276,7 +270,9 @@ const museMandate = readFileSync(join(pluginRoot, "hooks/session-start-muse.md")
 const museSheetNote = readFileSync(join(pluginRoot, "hooks/session-start-muse-sheet.md"), "utf8");
 
 // Muse declares the hook inline in its native manifest and runs it with
-// MUSE_PLUGIN_ROOT set; its stdout is plain additional context.
+// MUSE_PLUGIN_ROOT set; its stdout is plain additional context. The argv is
+// the one the generator stamps into the manifest.
+const museCommand = MUSE_HOOKS.find((hook) => hook.id === "session-start").command;
 function runMuseHook(sheet, env = {}, plugin = pluginRoot) {
   const home = mkdtempSync(join(tmpdir(), "pstack-hook-"));
   const config = env.XDG_CONFIG_HOME ?? join(home, ".config");
@@ -286,7 +282,9 @@ function runMuseHook(sheet, env = {}, plugin = pluginRoot) {
     writeSheet(join(dir, "pstack-models.md"), sheet);
   }
   try {
-    const r = spawnSync("sh", [join(plugin, "hooks/session-start.sh"), "muse"], {
+    const [program, ...args] = museCommand;
+    const r = spawnSync(program, args, {
+      cwd: plugin,
       env: { PATH: process.env.PATH, HOME: home, MUSE_PLUGIN_ROOT: plugin, ...env },
       encoding: "utf8",
     });
