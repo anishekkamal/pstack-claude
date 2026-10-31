@@ -1,36 +1,62 @@
-upstream moved: 2 commit(s), ..22b5e13
+upstream moved: 6 commit(s), ..5851c89
 Auto-merging .claude-plugin/marketplace.json
+Auto-merging .github/workflows/ci.yml
 Auto-merging docs/reference.md
 Auto-merging package.json
 Auto-merging plugins/pstack/.claude-plugin/plugin.json
 Auto-merging plugins/pstack/.codex-plugin/plugin.json
 Auto-merging plugins/pstack/.muse-plugin/plugin.json
+Auto-merging plugins/pstack/skills/poteto-mode/SKILL.md
+Auto-merging plugins/pstack/skills/poteto-mode/references/codex-tools.md
+Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
- .claude-plugin/marketplace.json                    |   2 +-
- CHANGES.md                                         |   8 ++
- VERSION                                            |   2 +-
- docs/reference.md                                  |   2 +-
- package.json                                       |   4 +-
- plugins/pstack/.claude-plugin/plugin.json          |   4 +-
- plugins/pstack/.codex-plugin/plugin.json           |   4 +-
- plugins/pstack/.github/plugin/plugin.json          |   2 +-
- plugins/pstack/.muse-plugin/plugin.json            |  17 ++-
- plugins/pstack/hooks/codex-hooks.json              |   2 +-
- plugins/pstack/hooks/session-start.ps1             | 100 +++++++++++++--
- plugins/pstack/hooks/session-start.sh              |   6 +
- .../skills/poteto-mode/references/muse-tools.md    |   2 +-
- tests/runtime-packaging.test.mjs                   |  23 +++-
- tests/session-hook-sheets.mjs                      |  49 ++++++++
- tests/session-hook-windows.test.mjs                | 140 +++++++++++++++++++--
- tests/session-hook.test.mjs                        |  55 ++++----
- tools/runtimes.mjs                                 |  36 ++++--
- 18 files changed, 386 insertions(+), 72 deletions(-)
+ .claude-plugin/marketplace.json                    |  2 +-
+ .github/scripts/statechart-watchdog.sh             |  8 +-
+ .github/workflows/ci.yml                           | 70 ++++++++++++++++
+ CHANGES.md                                         | 10 +++
+ CONTRIBUTING.md                                    |  2 +-
+ VERSION                                            |  2 +-
+ docs/reference.md                                  |  2 +-
+ package.json                                       |  4 +-
+ plugins/pstack/.claude-plugin/plugin.json          |  4 +-
+ plugins/pstack/.codex-plugin/plugin.json           |  4 +-
+ plugins/pstack/.github/plugin/plugin.json          |  2 +-
+ plugins/pstack/.muse-plugin/plugin.json            |  2 +-
+ plugins/pstack/hooks/session-start.ps1             |  9 ++-
+ plugins/pstack/pi/config.ts                        | 12 ++-
+ plugins/pstack/skills/architect/SKILL.md           |  2 +-
+ plugins/pstack/skills/arena/SKILL.md               |  2 +-
+ plugins/pstack/skills/how/SKILL.md                 |  2 +-
+ plugins/pstack/skills/interrogate/SKILL.md         |  2 +-
+ plugins/pstack/skills/poteto-mode/SKILL.md         |  2 +-
+ .../skills/poteto-mode/references/codex-tools.md   |  4 +-
+ .../poteto-mode/scripts/codex-session-effort.mjs   | 67 ++++++++++++++++
+ plugins/pstack/skills/reflect/SKILL.md             |  2 +-
+ plugins/pstack/skills/setup-pstack/SKILL.md        |  6 +-
+ .../skills/setup-pstack/scripts/check-sheet.sh     |  5 +-
+ .../skills/setup-pstack/scripts/read-sheet.sh      | 18 ++++-
+ plugins/pstack/skills/swarm/SKILL.md               |  2 +-
+ plugins/pstack/skills/why/SKILL.md                 |  2 +-
+ tests/check-sheet.test.mjs                         | 11 +++
+ tests/codex-session-effort.test.mjs                | 92 ++++++++++++++++++++++
+ tests/generate.test.mjs                            |  5 ++
+ tests/muse.test.mjs                                |  3 +-
+ tests/runtime-packaging.test.mjs                   | 28 +------
+ tests/session-hook-sheets.mjs                      | 16 +++-
+ tests/session-hook.test.mjs                        | 16 ++--
+ tests/skill-rules.test.mjs                         | 15 ++++
+ tools/forks.json                                   |  2 +-
+ tools/generate.mjs                                 |  7 +-
+ tools/runtimes.mjs                                 | 24 +++---
+ 38 files changed, 378 insertions(+), 90 deletions(-)
+ create mode 100644 plugins/pstack/skills/poteto-mode/scripts/codex-session-effort.mjs
+ create mode 100644 tests/codex-session-effort.test.mjs
 fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [114.00ms]
+1 package installed [87.00ms]
 ok: 89 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: 89 generated files current
