@@ -2,6 +2,32 @@
 
 This file is the release changelog, with one `## <version> - <title>` entry per release, newest first. The Cursor-to-Claude rewrite rules live in [`tools/substitutions.json`](tools/substitutions.json), and the [sync boundary](CONTRIBUTING.md#the-sync-boundary) in `CONTRIBUTING.md` defines how a change to upstream's skill content is declared.
 
+## 0.9.119 - Pi user agents, agent file effort, and permission asks from Pi agents
+
+Three changes to the Pi extension's `agent` tool, all from @foreztgump.
+
+A `.md` file in `pstack-agents` in the Pi agent directory now adds an agent type under its file name, with no `pstack:` prefix, as a Claude Code user agent has no plugin prefix. A user file never replaces an existing type, so `poteto-agent.md` adds `poteto-agent` beside `pstack:poteto-agent`. A hidden file, an entry that cannot be read, and a name with a colon are skipped, so the folder never breaks the plugin's own types. The extension does not read Pi's `agents` folder, where other subagent extensions keep files whose `tools:` allowlists it would not apply. It ignores a user file's `tools:`, `disallowedTools:`, and `isolation:` fields, so pass `readonly: true` or `isolation: "worktree"` on the call ([#351](https://github.com/michael-denyer/pstack-claude/pull/351)).
+
+An agent file's `effort:` is now the default when the call passes no `effort`, and `model: inherit` runs the agent on the parent's model. As on Claude Code, the call's `model` and `effort` win. The plugin's own agent files set neither field, so pstack's skills run as before ([#352](https://github.com/michael-denyer/pstack-claude/pull/352)).
+
+Each child `pi` process now has `PI_SUBAGENT_PARENT_SESSION` set to the session that started it. With `@gotgenes/pi-permission-system` installed globally, a child's permission ask goes to that session's prompt. Before, the extension cancelled the child's own dialog, and the ask was logged as the user's refusal ([#353](https://github.com/michael-denyer/pstack-claude/pull/353)).
+
+## 0.9.118 - Name the SessionStart hook in Codex and Claude Code
+
+The Codex and Claude Code SessionStart hooks now carry the `statusMessage` the Muse hooks already had, `Loading pstack routing`. Codex titles a hook with that field in its hook review list, which `/hooks` and the startup prompt's "Review hooks" option open, and shows it while the hook runs. Before, the list showed a generic label, so a user approving the hook could not tell it was pstack's. Codex's trust check hashes the whole plugin, so it asks for review after every pstack update; from this release the review list names the hook. Claude Code shows the same text while the hook runs. @teddychan reported it ([#354](https://github.com/michael-denyer/pstack-claude/issues/354)).
+
+## 0.9.117 - Give the no-comments reviewer a model role
+
+`no-comments` now reads its model from a `no-comments reviewer` line in the `pstack-models.md` sheet and passes it to `comment-sicko`. It was the one other skill that, like `thermos` before 0.9.115, spawned a plugin agent with no model, so the sheet could not reach it. The role defaults to the `default` tier (`opus`). On GitHub Copilot, a sheet written before this release lacks the new line, so, as with 0.9.115, the next skill that needs a role model runs `setup-pstack` first and offers each saved model as `(current)`.
+
+## 0.9.116 - Run statechart on Windows
+
+`statechart` now runs on Windows. It used to spawn `/bin/sh` to kill the TLC worker and clean up after it, which Windows Node cannot find, so the command crashed with `spawn /bin/sh ENOENT` once TLC finished. On Windows it now kills the worker's process tree with `taskkill`, and a small Node janitor, `janitor.ts`, takes over the `/bin/sh` janitor's cleanup. The worker's `TEMP` and `TMP` now point at the command's temp folder, as `TMPDIR` already did, because Node on Windows reads only those two. Before, TLC's working folder landed in `%TEMP%`, where cleanup after Ctrl-C did not reach it. TLC on Windows also ends each output line with `\r\n`, and the message reader kept the `\r`, so no message closed and a broken rule read as "its output names no rule that broke". The reader now drops a trailing `\r`. A `windows-latest` CI job charts the `MediaPlayer` corpus spec and diffs its `report.md` and `chart.mmd` against the Linux ones. @Adamya05 reported both failures with a patch ([#345](https://github.com/michael-denyer/pstack-claude/issues/345)).
+
+## 0.9.115 - Give the thermos reviewers a model role
+
+`thermos` now reads its model from a `thermos reviewers` line in the `pstack-models.md` sheet, and passes it to both thermo-nuclear reviewers. Before, it set no model, so both reviewers ran on the runtime's default subagent model. On Claude Code that is `CLAUDE_CODE_SUBAGENT_MODEL` when set and the parent's model otherwise, and no sheet line could change it. The role defaults to the `default` tier (`opus`), so `/setup-pstack` lists it and the skill gains a stamped Models section. On GitHub Copilot, which has no default models, a sheet written before this release has no `thermos reviewers` line. The session hook then reports `sheet invalid` and drops the sheet's role lines, and the next skill that needs a role model runs `setup-pstack` first. The re-run offers each saved model as `(current)`. @TomDeLeu-TomTom reported it ([#346](https://github.com/michael-denyer/pstack-claude/issues/346)).
+
 ## 0.9.114 - Read malformed UTF-16 sheets the same way in every session hook
 
 The shell, PowerShell, and Pi readers of the model sheet now agree on malformed input. A sheet that starts with the UTF-16 LE byte-order mark but has an odd byte count or an unpaired surrogate counts as missing in all three, so the session hook stays on and adds no role lines. Before, PowerShell and Pi decoded such a sheet loosely and could read `session hook: off` from it. The shell hook no longer prints `iconv`'s error on that sheet. A NUL byte is now part of its line in the shell too, so a line holding one never matches. Before, the shell dropped NUL bytes, which made a UTF-16 sheet without a byte-order mark read as `session hook: off`. `read-sheet.sh` now runs under `LC_ALL=C`, so under a UTF-8 locale macOS `tr` no longer cuts a sheet short at a byte that is not UTF-8. `check-sheet.sh` prints `sheet invalid: cannot decode <sheet>` for a sheet it cannot decode, where it used to exit with no line. The cases are in `sheetCases` and `roleCases`, which every hook's suite runs. Closes [#335](https://github.com/michael-denyer/pstack-claude/issues/335).
