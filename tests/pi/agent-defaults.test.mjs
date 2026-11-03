@@ -43,6 +43,18 @@ describe("agent file defaults", () => {
     expect(w.invocations().map((inv) => flag(inv, "--model"))).toEqual(["anthropic/parent-model"]);
   });
 
+  test("YAML quotes around a value, and a byte-order mark before the frontmatter, are not part of the field", async () => {
+    const { w, pi, ctx } = withAgents({ quoted: `model: "gw/quoted-model"\neffort: 'high'` });
+    const bom = String.fromCharCode(0xfeff);
+    writeFileSync(join(w.agentDir, "pstack-agents", "bom.md"), `${bom}---\nmodel: gw/bom-model\neffort: max\n---\nbody of bom\n`);
+    await run(pi, ctx, "quoted");
+    await run(pi, ctx, "bom");
+    expect(w.invocations().map((inv) => [flag(inv, "--model"), flag(inv, "--thinking"), inv.systemPrompt])).toEqual([
+      ["gw/quoted-model", "high", "body of quoted"],
+      ["gw/bom-model", "max", "body of bom"],
+    ]);
+  });
+
   test("a resume keeps the file's effort", async () => {
     const { w, pi, ctx } = withAgents({ slow: "effort: high" });
     await run(pi, ctx, "slow");
@@ -51,10 +63,15 @@ describe("agent file defaults", () => {
     expect(w.invocations().map((inv) => flag(inv, "--thinking"))).toEqual(["high", "high"]);
   });
 
-  test("a file effort that is not a level is an error naming the levels, and no child starts", async () => {
-    const { w, pi, ctx } = withAgents({ bad: "effort: turbo" });
-    const err = await run(pi, ctx, "bad").catch((e) => e);
-    expect(err.message).toContain(`effort "turbo" is not one of ${fixtureModels.efforts.join(", ")}`);
+  test("a bad effort or model from an agent file is an error that names the file, the same value on the call is not, and no child starts", async () => {
+    const { w, pi, ctx } = withAgents({ slow: "effort: turbo", odd: "model: gpt9", plain: "description: none" });
+    const file = (name) => join(w.agentDir, "pstack-agents", `${name}.md`);
+    const message = async (type, params) => (await run(pi, ctx, type, params).catch((e) => e)).message;
+    const levels = `effort "turbo" is not one of ${fixtureModels.efforts.join(", ")}`;
+    expect(await message("slow")).toBe(`${file("slow")}: ${levels}`);
+    expect(await message("odd")).toStartWith(`${file("odd")}: Unknown model "gpt9".`);
+    expect(await message("plain", { effort: "turbo" })).toBe(levels);
+    expect(await message("plain", { model: "gpt9" })).toStartWith('Unknown model "gpt9".');
     expect(w.invocations()).toEqual([]);
   });
 });
