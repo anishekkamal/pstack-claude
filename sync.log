@@ -1,38 +1,245 @@
-upstream moved: 4 commit(s), ..513c088
+upstream moved: 26 commit(s), ..79b36d9
 Auto-merging .claude-plugin/marketplace.json
+Auto-merging .github/workflows/ci.yml
+Auto-merging .github/workflows/security.yml
+Auto-merging .gitignore
+Auto-merging README.md
+Auto-merging docs/reference.md
 Auto-merging package.json
 Auto-merging plugins/pstack/.claude-plugin/plugin.json
 Auto-merging plugins/pstack/.codex-plugin/plugin.json
 Auto-merging plugins/pstack/.muse-plugin/plugin.json
+Auto-merging plugins/pstack/skills/poteto-mode/SKILL.md
+Auto-merging plugins/pstack/skills/poteto-mode/references/codex-tools.md
+Auto-merging tests/worktree-audit.test.mjs
+Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
- .claude-plugin/marketplace.json                    |  2 +-
- CHANGES.md                                         | 12 +++++++++++
- VERSION                                            |  2 +-
- package.json                                       |  4 ++--
- plugins/pstack/.claude-plugin/plugin.json          |  4 ++--
- plugins/pstack/.codex-plugin/plugin.json           |  4 ++--
- plugins/pstack/.github/plugin/plugin.json          |  2 +-
- plugins/pstack/.muse-plugin/plugin.json            |  2 +-
- plugins/pstack/pi/agent-tools.ts                   | 13 +++++------
- plugins/pstack/pi/agents.ts                        | 24 ++++++++++++++++-----
- plugins/pstack/pi/config.ts                        | 25 +++++++++++++---------
- plugins/pstack/pi/index.ts                         |  2 +-
- .../skills/poteto-mode/references/pi-tools.md      |  2 +-
- tests/agent-roster.test.mjs                        | 13 +++++------
- tests/pi/agent-defaults.test.mjs                   | 25 ++++++++++++++++++----
- tests/pi/agents-launch.test.mjs                    | 25 +++++++++++++++++-----
- tests/pi/config.test.mjs                           |  2 +-
- tests/pi/worktree.test.mjs                         |  9 ++++----
- 18 files changed, 117 insertions(+), 55 deletions(-)
-fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
+ .claude-plugin/marketplace.json                    |    2 +-
+ .gitattributes                                     |    2 +
+ .github/workflows/ci.yml                           |  190 +-
+ .github/workflows/security.yml                     |    2 +
+ .gitignore                                         |    3 +
+ CHANGES.md                                         |   66 +
+ CONTEXT.md                                         |    6 +-
+ CONTRIBUTING.md                                    |   25 +-
+ NOTICE.md                                          |    6 +-
+ README.md                                          |   21 +-
+ VERSION                                            |    2 +-
+ docs/pi-equivalence.md                             |    4 +-
+ docs/reference.md                                  |   36 +-
+ lean/Model/WatchPoll.lean                          |   82 +-
+ lean/Model/WatchPoll.mutations                     |    6 +-
+ package.json                                       |    4 +-
+ plugins/bun.lock                                   |  261 +++
+ plugins/package.json                               |    8 +
+ plugins/pstack/.claude-plugin/plugin.json          |    4 +-
+ plugins/pstack/.codex-plugin/plugin.json           |    4 +-
+ plugins/pstack/.codex-plugin/prompts/architect.md  |    7 -
+ plugins/pstack/.codex-plugin/prompts/arena.md      |    7 -
+ .../pstack/.codex-plugin/prompts/automate-me.md    |    7 -
+ plugins/pstack/.codex-plugin/prompts/babysit.md    |    7 -
+ .../.codex-plugin/prompts/benchmark-checklist.md   |    7 -
+ .../pstack/.codex-plugin/prompts/blast-radius.md   |    7 -
+ plugins/pstack/.codex-plugin/prompts/bro.md        |    7 -
+ plugins/pstack/.codex-plugin/prompts/correct.md    |    7 -
+ .../prompts/create-formal-verification-skill.md    |    7 -
+ .../prompts/create-verification-skill.md           |    7 -
+ plugins/pstack/.codex-plugin/prompts/deslop.md     |    7 -
+ .../pstack/.codex-plugin/prompts/figure-it-out.md  |    7 -
+ plugins/pstack/.codex-plugin/prompts/fix-ci.md     |    7 -
+ .../.codex-plugin/prompts/fix-merge-conflicts.md   |    7 -
+ .../.codex-plugin/prompts/get-pr-comments.md       |    7 -
+ plugins/pstack/.codex-plugin/prompts/how.md        |    7 -
+ .../.codex-plugin/prompts/in-your-own-words.md     |    7 -
+ .../pstack/.codex-plugin/prompts/interrogate.md    |    7 -
+ .../pstack/.codex-plugin/prompts/ketchup-video.md  |    7 -
+ plugins/pstack/.codex-plugin/prompts/ketchup.md    |    7 -
+ .../prompts/maintain-formal-verification-skill.md  |    7 -
+ .../prompts/maintain-verification-skill.md         |    7 -
+ .../prompts/make-pr-easy-to-review.md              |    7 -
+ .../pstack/.codex-plugin/prompts/no-comments.md    |    7 -
+ .../pstack/.codex-plugin/prompts/poteto-help.md    |    7 -
+ .../pstack/.codex-plugin/prompts/poteto-mode.md    |    7 -
+ plugins/pstack/.codex-plugin/prompts/recall.md     |    7 -
+ plugins/pstack/.codex-plugin/prompts/reflect.md    |    7 -
+ .../pstack/.codex-plugin/prompts/setup-pstack.md   |    7 -
+ plugins/pstack/.codex-plugin/prompts/sharpen.md    |    7 -
+ .../.codex-plugin/prompts/show-me-your-work.md     |    7 -
+ plugins/pstack/.codex-plugin/prompts/statechart.md |    7 -
+ plugins/pstack/.codex-plugin/prompts/swarm.md      |    7 -
+ plugins/pstack/.codex-plugin/prompts/tdd.md        |    7 -
+ plugins/pstack/.codex-plugin/prompts/teach.md      |    7 -
+ .../.codex-plugin/prompts/technical-writing.md     |    7 -
+ .../prompts/thermo-nuclear-code-quality-review.md  |    7 -
+ .../.codex-plugin/prompts/thermo-nuclear-review.md |    7 -
+ plugins/pstack/.codex-plugin/prompts/thermos.md    |    7 -
+ .../prompts/typescript-best-practices.md           |    7 -
+ plugins/pstack/.codex-plugin/prompts/unslop.md     |    7 -
+ .../.codex-plugin/prompts/what-did-i-get-done.md   |    7 -
+ plugins/pstack/.codex-plugin/prompts/why.md        |    7 -
+ plugins/pstack/.github/plugin/plugin.json          |    2 +-
+ plugins/pstack/.muse-plugin/plugin.json            |    2 +-
+ plugins/pstack/hooks/session-start-minimax.md      |   17 +
+ plugins/pstack/hooks/session-start.sh              |   24 +-
+ plugins/pstack/pi/agent-files.ts                   |  117 ++
+ plugins/pstack/pi/agent-tools.ts                   |   13 +-
+ plugins/pstack/pi/agents.ts                        |   11 +-
+ plugins/pstack/pi/config.ts                        |   90 +-
+ plugins/pstack/pi/index.ts                         |    7 +-
+ plugins/pstack/pi/one-shot.ts                      |    7 +-
+ plugins/pstack/pi/path-skills.ts                   |   18 +-
+ plugins/pstack/pi/schedule.ts                      |  150 +-
+ plugins/pstack/pi/slash.ts                         |   92 +
+ plugins/pstack/skills/poteto-mode/SKILL.md         |    4 +-
+ .../skills/poteto-mode/playbooks/autopilot-full.md |    4 +-
+ .../poteto-mode/playbooks/multi-phase-plan.md      |    4 +-
+ .../skills/poteto-mode/playbooks/orchestrate.md    |  121 +-
+ .../skills/poteto-mode/references/codex-tools.md   |    4 +-
+ .../skills/poteto-mode/references/copilot-tools.md |    2 +-
+ .../skills/poteto-mode/references/minimax-tools.md |   93 +
+ .../skills/poteto-mode/references/muse-tools.md    |    2 +-
+ .../skills/poteto-mode/references/pi-tools.md      |   10 +-
+ .../skills/poteto-mode/scripts/.prettierignore     |    3 -
+ .../skills/poteto-mode/scripts/check-plan.mjs      |    2 +-
+ .../skills/poteto-mode/scripts/check-plan.test.ts  |    2 +-
+ .../skills/poteto-mode/scripts/check-playbooks.mjs |    2 +-
+ .../poteto-mode/scripts/codex-session-effort.mjs   |    5 +-
+ .../skills/poteto-mode/scripts/orch/orch.test.ts   | 1630 ----------------
+ .../pstack/skills/poteto-mode/scripts/orch/orch.ts |  590 ------
+ .../skills/poteto-mode/scripts/orch/store.ts       | 1964 --------------------
+ .../pstack/skills/poteto-mode/scripts/package.json |    2 +-
+ .../scripts/watch-pr/fresh-install.test.ts         |    1 -
+ .../poteto-mode/scripts/watch-pr/github.test.ts    |   13 +-
+ .../skills/poteto-mode/scripts/watch-pr/github.ts  |    4 +-
+ .../poteto-mode/scripts/watch-pr/integrity.test.ts |    6 +-
+ .../skills/poteto-mode/scripts/watch-pr/landing.ts |    6 +-
+ .../skills/poteto-mode/scripts/watch-pr/policy.ts  |  149 +-
+ .../poteto-mode/scripts/watch-pr/shipping.test.ts  |    2 +-
+ .../skills/poteto-mode/scripts/watch-pr/types.ts   |   11 +-
+ .../skills/poteto-mode/scripts/worktree-audit.mjs  |   17 +-
+ .../skills/reflect/scripts/claude-project-dir.mjs  |   20 +-
+ plugins/pstack/skills/setup-pstack/SKILL.md        |    3 +-
+ .../pstack/skills/setup-pstack/scripts/sheet.awk   |   26 +-
+ .../skills/statechart/scripts/backends/cfg.ts      |    2 +-
+ .../skills/statechart/scripts/frontends/config.ts  |   36 +-
+ .../skills/statechart/scripts/frontends/spec.ts    |    4 +-
+ .../skills/statechart/scripts/frontends/view.ts    |    4 +-
+ plugins/pstack/skills/statechart/scripts/ir.ts     |   38 +-
+ .../skills/statechart/scripts/passes/label.ts      |   10 +-
+ .../skills/statechart/scripts/passes/regions.ts    |    6 +-
+ plugins/pstack/skills/statechart/scripts/run.ts    |   49 +-
+ .../skills/statechart/scripts/test/chart.test.ts   |   38 +-
+ .../statechart/scripts/test/child-env.test.ts      |   15 +
+ .../skills/statechart/scripts/test/cli.test.ts     |   15 +-
+ .../statechart/scripts/test/config-fuzz.test.ts    |   26 +-
+ .../skills/statechart/scripts/test/corpus.test.ts  |   20 +-
+ tests/agent-skills.test.mjs                        |   53 +-
+ tests/claude-project-dir.test.mjs                  |   29 +-
+ tests/directory-scan.test.mjs                      |   79 +
+ tests/generate-checkout.test.mjs                   |   36 +
+ tests/generate.test.mjs                            |  113 +-
+ tests/minimax-smoke.sh                             |   83 +
+ tests/minimax.test.mjs                             |   70 +
+ tests/pi/agent-defaults.test.mjs                   |    9 +
+ tests/pi/agent-tools-off.test.mjs                  |   20 +
+ tests/pi/agents-launch.test.mjs                    |   60 +-
+ tests/pi/agents-run.test.mjs                       |    1 +
+ tests/pi/config.test.mjs                           |   14 +-
+ tests/pi/fake-pi.mjs                               |    5 +-
+ tests/pi/harness.mjs                               |    5 +-
+ tests/pi/host.mjs                                  |    4 +
+ tests/pi/interaction.test.mjs                      |  130 +-
+ tests/pi/live.test.mjs                             |   11 +-
+ tests/pi/parent-session.test.mjs                   |   10 +-
+ tests/pi/slash.test.mjs                            |   57 +
+ tests/readme-facts.test.mjs                        |   11 +-
+ tests/runtime-packaging.test.mjs                   |    8 +
+ tests/session-hook.test.mjs                        |   37 +-
+ tests/skill-collision-repro.sh                     |    4 +-
+ tests/skill-rules.test.mjs                         |   10 +
+ tests/worktree-audit.test.mjs                      |   39 +-
+ tla/OrchStoreLock.matrix                           |   84 -
+ tla/OrchStoreLock.mutations                        |  119 --
+ tla/OrchStoreLock.tla                              |  351 ----
+ tools/forks.json                                   |  100 +-
+ tools/generate.mjs                                 |   90 +-
+ tools/runtimes.mjs                                 |   71 +-
+ tools/substitutions.json                           |   34 +-
+ tools/upstream.json                                |    2 +-
+ tools/validate-skills.mjs                          |   33 +-
+ 153 files changed, 2402 insertions(+), 5930 deletions(-)
+ create mode 100644 .gitattributes
+ create mode 100644 plugins/bun.lock
+ create mode 100644 plugins/package.json
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/architect.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/arena.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/automate-me.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/babysit.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/benchmark-checklist.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/blast-radius.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/bro.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/correct.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/create-formal-verification-skill.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/create-verification-skill.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/deslop.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/figure-it-out.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/fix-ci.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/fix-merge-conflicts.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/get-pr-comments.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/how.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/in-your-own-words.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/interrogate.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/ketchup-video.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/ketchup.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/maintain-formal-verification-skill.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/maintain-verification-skill.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/make-pr-easy-to-review.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/no-comments.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/poteto-help.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/poteto-mode.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/recall.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/reflect.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/setup-pstack.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/sharpen.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/show-me-your-work.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/statechart.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/swarm.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/tdd.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/teach.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/technical-writing.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/thermo-nuclear-code-quality-review.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/thermo-nuclear-review.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/thermos.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/typescript-best-practices.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/unslop.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/what-did-i-get-done.md
+ delete mode 100644 plugins/pstack/.codex-plugin/prompts/why.md
+ create mode 100644 plugins/pstack/hooks/session-start-minimax.md
+ create mode 100644 plugins/pstack/pi/agent-files.ts
+ create mode 100644 plugins/pstack/pi/slash.ts
+ create mode 100644 plugins/pstack/skills/poteto-mode/references/minimax-tools.md
+ delete mode 100644 plugins/pstack/skills/poteto-mode/scripts/orch/orch.test.ts
+ delete mode 100755 plugins/pstack/skills/poteto-mode/scripts/orch/orch.ts
+ delete mode 100644 plugins/pstack/skills/poteto-mode/scripts/orch/store.ts
+ create mode 100644 plugins/pstack/skills/statechart/scripts/test/child-env.test.ts
+ create mode 100644 tests/directory-scan.test.mjs
+ create mode 100644 tests/generate-checkout.test.mjs
+ create mode 100755 tests/minimax-smoke.sh
+ create mode 100644 tests/minimax.test.mjs
+ create mode 100644 tests/pi/agent-tools-off.test.mjs
+ create mode 100644 tests/pi/slash.test.mjs
+ delete mode 100644 tla/OrchStoreLock.matrix
+ delete mode 100644 tla/OrchStoreLock.mutations
+ delete mode 100644 tla/OrchStoreLock.tla
+fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json, docs/reference.md
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [128.00ms]
-ok: 89 generated files current
+1 package installed [120.00ms]
+ok: 46 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
-ok: 89 generated files current
+ok: 46 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: local markdown links stay inside plugins/pstack/skills
 ok: no prose in plugins/pstack/skills points at a path outside it
