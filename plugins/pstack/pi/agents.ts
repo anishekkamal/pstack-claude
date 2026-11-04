@@ -9,7 +9,8 @@ import { Value } from "typebox/value";
 import { noticeOf, OUTPUT_CAP_BYTES, statusText, truncateUtf8 } from "./agent-text.ts";
 import type { AgentParams } from "./agent-tools.ts";
 import { type Activity, alive, type ChildExit, PiChild, terminateGroup } from "./child.ts";
-import { checkEffort, DEPTH_FLAG, GENERAL_PURPOSE, loadAgentTypes, PSTACK_STATE_DIR, readSheet, resolveModel, type Settings } from "./config.ts";
+import { loadAgentTypes } from "./agent-files.ts";
+import { checkEffort, DEPTH_FLAG, GENERAL_PURPOSE, InvalidValueError, PSTACK_STATE_DIR, readSheet, resolveModel, type Settings } from "./config.ts";
 import { ensureWorktree, planWorktree, settleWorktree, type Worktree, worktreeSchema } from "./worktree.ts";
 
 const ENTRY_TYPE = "pstack-agents";
@@ -138,6 +139,10 @@ function childArgs(identity: AgentIdentity, depth: number): string[] {
   if (identity.model) args.push("--model", identity.model);
   if (identity.thinking) args.push("--thinking", identity.thinking);
   if (identity.systemPromptFile) args.push("--append-system-prompt", identity.systemPromptFile);
+  // @gotgenes/pi-permission-system 42.0.0 names a forwarded ask's agent from this tag in the child's
+  // system prompt, and picks its per-agent permission policy by that name; without it the parent's
+  // dialog says "unknown".
+  args.push("--append-system-prompt", `<active_agent name="${identity.subagentType}" />`);
   args.push(`--${DEPTH_FLAG}`, String(depth + 1));
   const excluded = [...(identity.readonly ? ["edit", "write"] : []), ...(depth + 1 >= MAX_SPAWN_DEPTH ? ["agent"] : [])];
   if (excluded.length) args.push("--exclude-tools", excluded.join(","));
@@ -193,12 +198,12 @@ function reapOrphan(record: RunningRecord, killGraceMs: number): Promise<void> {
 const now = () => new Date().toISOString();
 
 // A value the call left out came from the agent file, which the caller never
-// saw, so an error over it names that file.
+// saw, so an error over the value names that file.
 function fromAgentFile<T>(file: string | undefined, passed: string | undefined, resolve: () => T): T {
   try {
     return resolve();
   } catch (e) {
-    if (passed !== undefined || file === undefined) throw e;
+    if (passed !== undefined || file === undefined || !(e instanceof InvalidValueError)) throw e;
     throw new Error(`${file}: ${(e as Error).message}`);
   }
 }
