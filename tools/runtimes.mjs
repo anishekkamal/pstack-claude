@@ -7,10 +7,11 @@ import { code, codeList, PLUGIN, SKILLS } from "./plugin.mjs";
 
 // Every runtime other than Claude Code that reads the skills through a mapping
 // file under poteto-mode/references/. A row gives the runtime the generated
-// Model names section in its mapping file, and a row with a `key` its
+// Model names section in its mapping file, a pointer in poteto-mode's
+// Platform Adaptation sentence, and a row with a `key` its
 // models.json block, checked by `checkModels`. A `skillPreambles` runtime also gets a preamble under
 // the first heading of each skill its Per-skill notes table lists. Pi has
-// none: its one pointer is hand-written in poteto-mode's Platform
+// none: its one pointer is in poteto-mode's Platform
 // Adaptation section. `manifest` is the file the generator stamps VERSION
 // into, `validate` checks the runtime's packaging against the tree once that
 // manifest parses, and `hooks` lists the hooks files the manifest names,
@@ -80,20 +81,6 @@ export const RUNTIMES = [
     validate: validateMiniMaxPackage,
   },
   {
-    name: "OpenCode 2",
-    mapping: "opencode-tools.md",
-    modelNames: openCodeModelNamesSection,
-    manifest: "package.json",
-    validate: ({ manifest, pathExists }) => validateOpenCodePackage(manifest, { pathExists }),
-  },
-  {
-    name: "Kimi Code CLI",
-    mapping: "kimi-tools.md",
-    modelNames: kimiModelNamesSection,
-    manifest: "kimi.plugin.json",
-    validate: ({ manifest, pathExists }) => validateKimiManifest(manifest, { pathExists }),
-  },
-  {
     name: "Antigravity",
     mapping: "agy-tools.md",
     modelNames: agyModelNamesSection,
@@ -111,11 +98,25 @@ export const RUNTIMES = [
       validateOmpPackage(manifest, { marketplace: JSON.parse(read(".claude-plugin/marketplace.json")), pathExists }),
   },
   {
+    name: "Kimi Code CLI",
+    mapping: "kimi-tools.md",
+    modelNames: kimiModelNamesSection,
+    manifest: "kimi.plugin.json",
+    validate: ({ manifest, pathExists }) => validateKimiManifest(manifest, { pathExists }),
+  },
+  {
     name: "Grok Build",
     mapping: "grok.md",
     modelNames: grokModelNamesSection,
     manifest: `${PLUGIN}/.grok-plugin/plugin.json`,
     validate: ({ manifest, pathExists, agentSkills }) => validateGrokPlugin(manifest, { pathExists, agentSkills }),
+  },
+  {
+    name: "OpenCode 2",
+    mapping: "opencode-tools.md",
+    modelNames: openCodeModelNamesSection,
+    manifest: "package.json",
+    validate: ({ manifest, pathExists }) => validateOpenCodePackage(manifest, { pathExists }),
   },
 ].map((runtime) => ({
   ...runtime,
@@ -126,6 +127,23 @@ export const RUNTIMES = [
       "including its per-skill notes, before following this skill."
     : null,
 }));
+
+// poteto-mode's Platform Adaptation sentence points at each mapping in row
+// order, so the order of RUNTIMES is the order a reader meets the runtimes.
+export const PLATFORM_ADAPTATION_OPEN = "These skills use Claude Code tool names";
+
+export function platformAdaptation() {
+  const pointer = (runtime) => `On ${runtime.name}, read [\`references/${runtime.mapping}\`](references/${runtime.mapping})`;
+  const [first, ...rest] = RUNTIMES;
+  return [
+    `${PLATFORM_ADAPTATION_OPEN} (the \`Skill\` tool, the \`Agent\` tool, \`AskUserQuestion\`) and the Claude model names ` +
+      "the `Agent` tool accepts, as each Models section lists them. On Claude Code they work as written.",
+    `${pointer(first)} for the ${first.name} equivalent of a Claude tool, model, or skill named by these workflows.`,
+    ...rest.map((runtime) => `${pointer(runtime)} instead.`),
+    "Other runtimes can discover the same Agent Skills tree, but they must use their own tool, model, and " +
+      "configuration equivalents. No one of these mappings is a cross-runtime map.",
+  ].join(" ");
+}
 
 // Codex and Muse have no Claude aliases, so each block gives a model per tier.
 // A declaration, so the RUNTIMES rows above can call it at module load.
@@ -270,6 +288,9 @@ const tierRoles = (models, tier) =>
     .map((r) => code(r.role))
     .join(", ");
 
+const panelSkills = (models) =>
+  codeList([...new Set(models.roles.filter((r) => r.tier === "panel").map((r) => r.skill))]);
+
 // The Model names section of a runtime whose models.json block gives a model
 // per tier. `panel` follows "A good default panel", `dispatch` is an optional
 // paragraph before the closing line, and `ids` names what the sheet lists.
@@ -283,7 +304,7 @@ function tierModelNamesSection(models, { label, block, worker, panel, dispatch, 
     `your ${worker} (for example ${code(block.worker)}).\n` +
     `- Roles that default to the strongest Claude model (${tierRoles(models, "strongest")}): ` +
     `your strongest ${label} model (for example ${code(block.strongest)}).\n` +
-    "- Diverse-model panels (`arena`, `architect`, `interrogate`, `how` critics, `reflect`): the adversarial " +
+    `- Diverse-model panels (${panelSkills(models)}): the adversarial ` +
     `signal comes from model diversity, so use the distinct ${label} models available to you. A good default panel ` +
     panel(codeList(block.panel)) +
     "\n\n" +
@@ -340,7 +361,7 @@ export function piModelNamesSection(models) {
     `ID and the ${code("agent")} call fails with ${code(`No API key found for ${fallback}`)}. ` +
     "The `agent` tool also takes a full " +
     "`provider/id`, passed through unchanged, and `inherit-parent`, `auto`, or no `model` runs the child on the " +
-    "parent's current model. Diverse-model panels (`arena`, `architect`, `interrogate`, `how` critics, `reflect`) " +
+    `parent's current model. Diverse-model panels (${panelSkills(models)}) ` +
     "stay diverse only while their aliases resolve to distinct models. If one model family is all you can reach, " +
     "vary the reasoning effort and note in the verdict that diversity was reduced.\n\n" +
     "`/setup-pstack` writes the configured model list. On Pi, keep the aliases and remap them with `pi models:`."
@@ -428,7 +449,7 @@ export function copilotModelNamesSection(models) {
     `- Roles that default to the worker model (${tierRoles(models, "worker")}): the worker model the user chose.\n` +
     `- Roles that default to the strongest model (${tierRoles(models, "strongest")}): ` +
     "the strongest model the user chose.\n" +
-    "- Diverse-model panels (`arena`, `architect`, `interrogate`, `how` critics, `reflect`): the adversarial " +
+    `- Diverse-model panels (${panelSkills(models)}): the adversarial ` +
     "signal comes from model diversity, so fill a panel from distinct vendors in the `task` tool's `model` " +
     "list (Claude, GPT, Gemini, Grok, and so on). pstack ships no default Copilot panel. If only one vendor is " +
     "reachable, vary reasoning effort and note in the verdict that diversity was reduced.\n\n" +
@@ -459,7 +480,7 @@ export function minimaxModelNamesSection(models) {
     `- Roles that default to the worker model (${tierRoles(models, "worker")}): the worker model the user chose.\n` +
     `- Roles that default to the strongest model (${tierRoles(models, "strongest")}): ` +
     "the strongest model the user chose.\n" +
-    "- Diverse-model panels (`arena`, `architect`, `interrogate`, `how` critics, `reflect`): the adversarial " +
+    `- Diverse-model panels (${panelSkills(models)}): the adversarial ` +
     "signal comes from model diversity, so fill a panel from distinct providers. If only one model family is " +
     "reachable, vary reasoning effort and note in the verdict that diversity was reduced.\n\n" +
     "`/setup-pstack` writes the configured model list. On MiniMax Code, list the models with `mcode provider list` " +
@@ -519,7 +540,7 @@ export function agyModelNamesSection(models) {
     "- Pass the role's model as `Model` on `invoke_subagent`. For `inherit-parent` or `auto`, omit `Model`.\n" +
     `- Roles that default to the worker model (${tierRoles(models, "worker")}): the worker model the user chose.\n` +
     `- Roles that default to the strongest model (${tierRoles(models, "strongest")}): the strongest model the user chose.\n` +
-    "- Diverse-model panels (`arena`, `architect`, `interrogate`, `how` critics, `reflect`): the adversarial " +
+    `- Diverse-model panels (${panelSkills(models)}): the adversarial ` +
     "signal comes from model diversity. Use distinct available models and report when the panel shares a model family.\n\n" +
     "`/setup-pstack` writes the sheet. Antigravity accepts `flash_lite`; the Copilot sheet checker rejects underscores " +
     "in model IDs and does not apply to Antigravity."
@@ -594,7 +615,7 @@ export function grokModelNamesSection(models) {
     "when it cannot apply a sheet choice, report that limitation instead of claiming model diversity.\n" +
     `- Roles that default to the worker model (${tierRoles(models, "worker")}): the worker model the user chose.\n` +
     `- Roles that default to the strongest model (${tierRoles(models, "strongest")}): the strongest model the user chose.\n` +
-    "- Diverse-model panels (`arena`, `architect`, `interrogate`, `how` critics, `reflect`) require distinct models. " +
+    `- Diverse-model panels (${panelSkills(models)}) require distinct models. ` +
     "Report when the available dispatch cannot provide that diversity.\n\n" +
     "`/setup-pstack` writes the sheet. Choose only models the session exposes."
   );
