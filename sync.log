@@ -1,122 +1,49 @@
-upstream moved: 16 commit(s), ..477c077
+upstream moved: 5 commit(s), ..a88df17
 Auto-merging .claude-plugin/marketplace.json
-Auto-merging .github/workflows/security.yml
-Auto-merging README.md
-Auto-merging docs/reference.md
 Auto-merging package.json
 Auto-merging plugins/pstack/.claude-plugin/plugin.json
 Auto-merging plugins/pstack/.codex-plugin/plugin.json
 Auto-merging plugins/pstack/.muse-plugin/plugin.json
-Auto-merging plugins/pstack/skills/create-verification-skill/SKILL.md
 Auto-merging plugins/pstack/skills/poteto-mode/SKILL.md
 Auto-merging plugins/pstack/skills/poteto-mode/references/codex-tools.md
 Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
- .claude-plugin/marketplace.json                    |   2 +-
- .github/workflows/security.yml                     |   2 +-
- CHANGES.md                                         |  30 ++++
- CONTRIBUTING.md                                    |   2 +
- NOTICE.md                                          |   2 +-
- README.md                                          |  88 ++++++++++-
- VERSION                                            |   2 +-
- docs/reference.md                                  |  23 +--
- kimi.plugin.json                                   |  10 ++
- package.json                                       |   7 +-
- plugins/pstack/.antigravity-plugin/plugin.json     |   8 +
- plugins/pstack/.claude-plugin/icon.png             | Bin 955906 -> 192542 bytes
- plugins/pstack/.claude-plugin/plugin.json          |   4 +-
- plugins/pstack/.codex-plugin/plugin.json           |   4 +-
- plugins/pstack/.github/plugin/plugin.json          |   2 +-
- plugins/pstack/.grok-plugin/plugin.json            |   9 ++
- plugins/pstack/.muse-plugin/plugin.json            |   2 +-
- plugins/pstack/assets/pstack-icon.png              | Bin 955906 -> 192542 bytes
- plugins/pstack/grok/skills/pstack-routing/SKILL.md |   8 +
- plugins/pstack/hooks.json                          |  10 ++
- plugins/pstack/hooks/agy-context.awk               |   9 ++
- plugins/pstack/hooks/json.awk                      |   2 +-
- plugins/pstack/hooks/kimi-instructions.md          |  17 ++
- plugins/pstack/hooks/session-start-agy.md          |  17 ++
- plugins/pstack/hooks/session-start-opencode.md     |  17 ++
- plugins/pstack/hooks/session-start.sh              |  13 +-
- plugins/pstack/omp/index.mjs                       |  34 ++++
- plugins/pstack/opencode/index.js                   |  49 ++++++
- plugins/pstack/package.json                        |   8 +
- plugins/pstack/skills/architect/SKILL.md           |   2 +
- plugins/pstack/skills/arena/SKILL.md               |   2 +
- plugins/pstack/skills/automate-me/SKILL.md         |   2 +
- plugins/pstack/skills/babysit/SKILL.md             |   2 +
- .../create-formal-verification-skill/SKILL.md      |   2 +
- .../skills/create-verification-skill/SKILL.md      |   2 +
- plugins/pstack/skills/deslop/SKILL.md              |   4 +-
- plugins/pstack/skills/how/SKILL.md                 |   2 +
- .../skills/how/references/explainer-prompt.md      |   6 +-
- plugins/pstack/skills/interrogate/SKILL.md         |   2 +
- .../maintain-formal-verification-skill/SKILL.md    |   2 +
- .../skills/maintain-verification-skill/SKILL.md    |   2 +
- plugins/pstack/skills/no-comments/SKILL.md         |   2 +
- plugins/pstack/skills/poteto-mode/SKILL.md         |   2 +-
- .../skills/poteto-mode/playbooks/session-pickup.md |   4 +-
- .../skills/poteto-mode/references/agy-tools.md     |  99 ++++++++++++
- .../skills/poteto-mode/references/codex-tools.md   |   3 +
- .../skills/poteto-mode/references/copilot-tools.md |   2 +-
- .../pstack/skills/poteto-mode/references/grok.md   |  50 ++++++
- .../skills/poteto-mode/references/kimi-tools.md    |  40 +++++
- .../skills/poteto-mode/references/omp-tools.md     |  39 +++++
- .../poteto-mode/references/opencode-tools.md       |  29 ++++
- .../skills/poteto-mode/scripts/worktree-audit.mjs  |   4 +-
- plugins/pstack/skills/recall/SKILL.md              |   4 +
- plugins/pstack/skills/reflect/SKILL.md             |   2 +
- plugins/pstack/skills/setup-pstack/SKILL.md        |  20 ++-
- plugins/pstack/skills/show-me-your-work/SKILL.md   |   4 +
- plugins/pstack/skills/swarm/SKILL.md               |   2 +
- plugins/pstack/skills/teach/SKILL.md               |   2 +
- plugins/pstack/skills/thermos/SKILL.md             |   2 +
- plugins/pstack/skills/why/SKILL.md                 |   2 +
- tests/agy.test.mjs                                 |  65 ++++++++
- tests/directory-scan.test.mjs                      |  29 +++-
- tests/generate.test.mjs                            |  11 +-
- tests/grok-smoke.py                                |  57 +++++++
- tests/grok.test.mjs                                |  51 ++++++
- tests/kimi.test.mjs                                |  32 ++++
- tests/omp.test.mjs                                 | 132 ++++++++++++++++
- tests/opencode.test.mjs                            | 145 +++++++++++++++++
- tests/pi/agents-run.test.mjs                       |   2 +-
- tests/runtime-packaging.test.mjs                   |  45 +++++-
- tests/session-hook-sheets.mjs                      |   2 +-
- tests/session-hook.test.mjs                        |  35 +++--
- tools/forks.json                                   |  20 ++-
- tools/generate.mjs                                 |  11 +-
- tools/runtimes.mjs                                 | 173 +++++++++++++++++++++
- 75 files changed, 1466 insertions(+), 67 deletions(-)
- create mode 100644 kimi.plugin.json
- create mode 100644 plugins/pstack/.antigravity-plugin/plugin.json
- create mode 100644 plugins/pstack/.grok-plugin/plugin.json
- create mode 100644 plugins/pstack/grok/skills/pstack-routing/SKILL.md
- create mode 100644 plugins/pstack/hooks.json
- create mode 100644 plugins/pstack/hooks/agy-context.awk
- create mode 100644 plugins/pstack/hooks/kimi-instructions.md
- create mode 100644 plugins/pstack/hooks/session-start-agy.md
- create mode 100644 plugins/pstack/hooks/session-start-opencode.md
- create mode 100644 plugins/pstack/omp/index.mjs
- create mode 100644 plugins/pstack/opencode/index.js
- create mode 100644 plugins/pstack/package.json
- create mode 100644 plugins/pstack/skills/poteto-mode/references/agy-tools.md
- create mode 100644 plugins/pstack/skills/poteto-mode/references/grok.md
- create mode 100644 plugins/pstack/skills/poteto-mode/references/kimi-tools.md
- create mode 100644 plugins/pstack/skills/poteto-mode/references/omp-tools.md
- create mode 100644 plugins/pstack/skills/poteto-mode/references/opencode-tools.md
- create mode 100644 tests/agy.test.mjs
- create mode 100644 tests/grok-smoke.py
- create mode 100644 tests/grok.test.mjs
- create mode 100644 tests/kimi.test.mjs
- create mode 100644 tests/omp.test.mjs
- create mode 100644 tests/opencode.test.mjs
+ .claude-plugin/marketplace.json                    |  2 +-
+ CHANGES.md                                         |  6 ++
+ CONTEXT.md                                         |  2 +-
+ CONTRIBUTING.md                                    |  2 +-
+ VERSION                                            |  2 +-
+ kimi.plugin.json                                   |  2 +-
+ package.json                                       |  4 +-
+ plugins/pstack/.antigravity-plugin/plugin.json     |  2 +-
+ plugins/pstack/.claude-plugin/plugin.json          |  4 +-
+ plugins/pstack/.codex-plugin/plugin.json           |  4 +-
+ plugins/pstack/.github/plugin/plugin.json          |  2 +-
+ plugins/pstack/.grok-plugin/plugin.json            |  2 +-
+ plugins/pstack/.muse-plugin/plugin.json            |  2 +-
+ plugins/pstack/package.json                        |  2 +-
+ plugins/pstack/skills/poteto-mode/SKILL.md         |  2 +-
+ .../skills/poteto-mode/references/agy-tools.md     |  2 +-
+ .../skills/poteto-mode/references/codex-tools.md   |  2 +-
+ .../skills/poteto-mode/references/copilot-tools.md |  2 +-
+ .../pstack/skills/poteto-mode/references/grok.md   |  8 +--
+ .../skills/poteto-mode/references/minimax-tools.md |  2 +-
+ .../skills/poteto-mode/references/muse-tools.md    |  2 +-
+ .../skills/poteto-mode/references/pi-tools.md      |  2 +-
+ tests/copilot.test.mjs                             |  2 +-
+ tests/generate.test.mjs                            |  8 ++-
+ tests/models.test.mjs                              | 24 ++++++++
+ tests/runtime-packaging.test.mjs                   | 15 ++++-
+ tools/forks.json                                   |  2 +-
+ tools/generate.mjs                                 |  8 ++-
+ tools/runtimes.mjs                                 | 65 ++++++++++++++--------
+ 29 files changed, 130 insertions(+), 54 deletions(-)
 fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [96.00ms]
+1 package installed [108.00ms]
 ok: 55 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: 55 generated files current
