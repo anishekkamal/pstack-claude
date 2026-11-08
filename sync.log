@@ -1,34 +1,56 @@
-upstream moved: 2 commit(s), ..df9bc05
+upstream moved: 5 commit(s), ..91ab921
 Auto-merging .claude-plugin/marketplace.json
+Auto-merging docs/reference.md
 Auto-merging package.json
 Auto-merging plugins/pstack/.claude-plugin/plugin.json
 Auto-merging plugins/pstack/.codex-plugin/plugin.json
 Auto-merging plugins/pstack/.muse-plugin/plugin.json
+Auto-merging plugins/pstack/skills/poteto-mode/references/codex-tools.md
+Auto-merging tests/worktree-audit.test.mjs
+Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
- .claude-plugin/marketplace.json                      |  2 +-
- CHANGES.md                                           |  6 ++++++
- VERSION                                              |  2 +-
- kimi.plugin.json                                     |  2 +-
- package.json                                         |  4 ++--
- plugins/pstack/.antigravity-plugin/plugin.json       |  2 +-
- plugins/pstack/.claude-plugin/plugin.json            |  4 ++--
- plugins/pstack/.codex-plugin/plugin.json             |  4 ++--
- plugins/pstack/.github/plugin/plugin.json            |  2 +-
- plugins/pstack/.grok-plugin/plugin.json              |  2 +-
- plugins/pstack/.muse-plugin/plugin.json              |  2 +-
- plugins/pstack/package.json                          |  2 +-
- plugins/pstack/skills/poteto-mode/scripts/resume.mjs |  2 ++
- tests/resume.test.mjs                                | 14 ++++++++++++++
- 14 files changed, 36 insertions(+), 14 deletions(-)
+ .claude-plugin/marketplace.json                    |  2 +-
+ CHANGES.md                                         |  8 +++
+ VERSION                                            |  2 +-
+ docs/pi-equivalence.md                             |  2 +-
+ docs/reference.md                                  |  4 +-
+ kimi.plugin.json                                   |  2 +-
+ package.json                                       |  4 +-
+ plugins/pstack/.antigravity-plugin/plugin.json     |  2 +-
+ plugins/pstack/.claude-plugin/plugin.json          |  4 +-
+ plugins/pstack/.codex-plugin/plugin.json           |  4 +-
+ plugins/pstack/.github/plugin/plugin.json          |  2 +-
+ plugins/pstack/.grok-plugin/plugin.json            |  2 +-
+ plugins/pstack/.muse-plugin/plugin.json            |  2 +-
+ plugins/pstack/LICENSE                             | 22 +++++++
+ plugins/pstack/package.json                        |  2 +-
+ plugins/pstack/skills/poteto-help/SKILL.md         |  6 +-
+ .../skills/poteto-mode/references/agy-tools.md     |  2 +-
+ .../skills/poteto-mode/references/codex-tools.md   |  4 +-
+ .../skills/poteto-mode/references/copilot-tools.md |  2 +-
+ .../skills/poteto-mode/references/minimax-tools.md |  4 +-
+ .../skills/poteto-mode/references/muse-tools.md    |  4 +-
+ .../skills/poteto-mode/scripts/worktree-audit.mjs  | 10 ++-
+ plugins/pstack/skills/setup-pstack/SKILL.md        | 48 ++------------
+ plugins/pstack/skills/setup-pstack/copilot.md      |  2 +-
+ .../skills/setup-pstack/references/runtimes.md     | 75 ++++++++++++++++++++++
+ tests/generate.test.mjs                            |  8 +++
+ tests/grok-smoke.py                                |  2 +-
+ tests/worktree-audit.test.mjs                      | 69 ++++++++++++++++++++
+ tools/forks.json                                   |  2 +-
+ tools/generate.mjs                                 |  1 +
+ 30 files changed, 227 insertions(+), 76 deletions(-)
+ create mode 100644 plugins/pstack/LICENSE
+ create mode 100644 plugins/pstack/skills/setup-pstack/references/runtimes.md
 fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [121.00ms]
-ok: 55 generated files current
+1 package installed [63.00ms]
+ok: 56 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
-ok: 55 generated files current
+ok: 56 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: local markdown links stay inside plugins/pstack/skills
 ok: no prose in plugins/pstack/skills points at a path outside it
