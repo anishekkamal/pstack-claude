@@ -1,53 +1,49 @@
-upstream moved: 5 commit(s), ..91ab921
-Auto-merging .claude-plugin/marketplace.json
+upstream moved: 7 commit(s), ..42fcb61
+Auto-merging .github/workflows/ci.yml
+Auto-merging README.md
 Auto-merging docs/reference.md
-Auto-merging package.json
-Auto-merging plugins/pstack/.claude-plugin/plugin.json
-Auto-merging plugins/pstack/.codex-plugin/plugin.json
-Auto-merging plugins/pstack/.muse-plugin/plugin.json
-Auto-merging plugins/pstack/skills/poteto-mode/references/codex-tools.md
-Auto-merging tests/worktree-audit.test.mjs
+Auto-merging plugins/pstack/skills/poteto-mode/SKILL.md
 Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
- .claude-plugin/marketplace.json                    |  2 +-
- CHANGES.md                                         |  8 +++
- VERSION                                            |  2 +-
- docs/pi-equivalence.md                             |  2 +-
- docs/reference.md                                  |  4 +-
- kimi.plugin.json                                   |  2 +-
- package.json                                       |  4 +-
- plugins/pstack/.antigravity-plugin/plugin.json     |  2 +-
- plugins/pstack/.claude-plugin/plugin.json          |  4 +-
- plugins/pstack/.codex-plugin/plugin.json           |  4 +-
- plugins/pstack/.github/plugin/plugin.json          |  2 +-
- plugins/pstack/.grok-plugin/plugin.json            |  2 +-
- plugins/pstack/.muse-plugin/plugin.json            |  2 +-
- plugins/pstack/LICENSE                             | 22 +++++++
- plugins/pstack/package.json                        |  2 +-
- plugins/pstack/skills/poteto-help/SKILL.md         |  6 +-
- .../skills/poteto-mode/references/agy-tools.md     |  2 +-
- .../skills/poteto-mode/references/codex-tools.md   |  4 +-
- .../skills/poteto-mode/references/copilot-tools.md |  2 +-
- .../skills/poteto-mode/references/minimax-tools.md |  4 +-
- .../skills/poteto-mode/references/muse-tools.md    |  4 +-
- .../skills/poteto-mode/scripts/worktree-audit.mjs  | 10 ++-
- plugins/pstack/skills/setup-pstack/SKILL.md        | 48 ++------------
- plugins/pstack/skills/setup-pstack/copilot.md      |  2 +-
- .../skills/setup-pstack/references/runtimes.md     | 75 ++++++++++++++++++++++
- tests/generate.test.mjs                            |  8 +++
- tests/grok-smoke.py                                |  2 +-
- tests/worktree-audit.test.mjs                      | 69 ++++++++++++++++++++
- tools/forks.json                                   |  2 +-
- tools/generate.mjs                                 |  1 +
- 30 files changed, 227 insertions(+), 76 deletions(-)
- create mode 100644 plugins/pstack/LICENSE
- create mode 100644 plugins/pstack/skills/setup-pstack/references/runtimes.md
-fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
+ .github/workflows/ci.yml                           |   5 +-
+ .github/workflows/hol-plugin-scanner.yml           |  32 +
+ CONTRIBUTING.md                                    |   1 +
+ README.md                                          |   6 +
+ docs/reference.md                                  |   4 +-
+ plugins/pstack/hooks/copilot-hooks.json            |   6 +-
+ plugins/pstack/hooks/session-start.ps1             |  88 ++-
+ plugins/pstack/skills/poteto-mode/SKILL.md         |   1 +
+ .../pstack/skills/poteto-mode/playbooks/bug-fix.md |  17 +
+ .../skills/poteto-mode/references/agy-tools.md     |   9 +-
+ .../skills/poteto-mode/references/copilot-tools.md |   3 +-
+ .../skills/poteto-mode/scripts/.prettierignore     |   2 +-
+ .../scripts/watch-pr/github.port.test.ts           | 427 +++++++++++++
+ .../poteto-mode/scripts/watch-pr/github.test.ts    | 402 +-----------
+ .../scripts/watch-pr/policy.port.test.ts           | 708 +++++++++++++++++++++
+ .../poteto-mode/scripts/watch-pr/policy.test.ts    | 673 +-------------------
+ tests/agent-roster.test.mjs                        |   9 +-
+ tests/agy.test.mjs                                 |   9 +-
+ tests/pre-tool-use.test.mjs                        |  25 +-
+ tests/runtime-packaging.test.mjs                   |  30 +-
+ tests/session-hook-windows.test.mjs                | 105 ++-
+ tests/session-hook.test.mjs                        |  26 +-
+ tests/tool-entry-points.test.mjs                   |  24 +
+ tools/forks.json                                   |   8 +-
+ tools/generate.mjs                                 |  24 +-
+ tools/plugin.mjs                                   |  19 +-
+ tools/sync.mjs                                     |  12 +-
+ tools/validate-skills.mjs                          |   5 +-
+ 28 files changed, 1562 insertions(+), 1118 deletions(-)
+ create mode 100644 .github/workflows/hol-plugin-scanner.yml
+ create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/github.port.test.ts
+ create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/policy.port.test.ts
+ create mode 100644 tests/tool-entry-points.test.mjs
+fork overlay: nothing to change
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [63.00ms]
+1 package installed [83.00ms]
 ok: 56 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: 56 generated files current
