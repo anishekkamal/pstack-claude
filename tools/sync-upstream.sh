@@ -27,12 +27,27 @@ git config user.name >/dev/null 2>&1 || git config user.name "github-actions[bot
 git config user.email >/dev/null 2>&1 || git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
 # Upstream wins every conflicting hunk; the fork overlay below puts the fork's facts back.
+rm -f sync-conflicts.txt
 if ! git merge --no-edit -X theirs upstream/main -m "Sync upstream port $up ($count commits)"; then
+  # The fork keeps its own .github/workflows (see below). A workflow that upstream changed and the
+  # fork dropped is a modify/delete conflict that -X theirs cannot settle, so settle those here by
+  # keeping the fork's side, then check whether anything else is still conflicted.
+  for f in $(git diff --name-only --diff-filter=U -- .github/workflows); do
+    if git cat-file -e "HEAD:$f" 2>/dev/null; then
+      git checkout --ours -- "$f" && git add -- "$f"
+    else
+      git rm -q -f -- "$f"
+    fi
+  done
   git diff --name-only --diff-filter=U > sync-conflicts.txt || true
-  git merge --abort
-  echo "merge needs a human; conflicting files:"
-  cat sync-conflicts.txt
-  exit 2
+  if [ -s sync-conflicts.txt ]; then
+    git merge --abort
+    echo "merge needs a human; conflicting files:"
+    cat sync-conflicts.txt
+    exit 2
+  fi
+  rm -f sync-conflicts.txt
+  git -c core.editor=true commit -q --no-edit
 fi
 
 # GITHUB_TOKEN may not push workflow edits, so the fork keeps its own .github/workflows.
