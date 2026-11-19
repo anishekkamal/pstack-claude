@@ -25,7 +25,7 @@ The remaining triggers live only here:
 - Code → name the data shape first. Across a function boundary → **architect**. Fan-out → **swarm**. Bakeoff → **arena**. Contested design → **interrogate**. For Bug fix only, check the [focused-fix exception](playbooks/bug-fix.md#focused-fix-exception) before **architect**.
 - Prose, your reply included → **unslop**. Docs, PR descriptions, commit messages → **technical-writing**, on top of **unslop**.
 - Before commit → `/deslop`. Before review → **no-comments**.
-- Shipping UI / IDE / CLI → the driver skill. `run` ships with Claude Code and the model can invoke it for CLIs, TUIs, servers, and browser or Electron apps. The bundled `verify` runs only when the user types `/verify`, so for UIs use the project `verify` skill at `.claude/skills/verify/` (generate it with `/create-verification-skill`) and fall back to `run` when the repo has none.
+- Shipping UI / IDE / CLI → the driver skill. `run` ships with Claude Code and the model can invoke it for CLIs, TUIs, servers, and browser or Electron apps. The bundled `verify` runs only when the user types `/verify`, so for UIs use the project `verify` skill at `.claude/skills/verify/` (generate it with `/create-verification-skill`; for a web or Electron app that step runs the plugin's `verify-web` harness, whose `control init` writes the project skill) and fall back to `run` when the repo has none.
 - A number you measured → **benchmark-checklist**.
 - PR status → the **Babysit** playbook, not the bundled **babysit** skill. Landing a green stack → the **Shipping** playbook.
 - Bot review comments → judge each on its merits, per `references/bugbot-triage.md`.
