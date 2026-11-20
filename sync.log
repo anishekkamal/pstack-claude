@@ -1,23 +1,52 @@
-upstream moved: 7 commit(s), ..412990b
+upstream moved: 4 commit(s), ..1cadabb
 Auto-merging .claude-plugin/marketplace.json
-Auto-merging .github/workflows/ci.yml
-CONFLICT (modify/delete): .github/workflows/hol-plugin-scanner.yml deleted in HEAD and modified in upstream/main.  Version upstream/main of .github/workflows/hol-plugin-scanner.yml left in tree.
-Auto-merging README.md
 Auto-merging docs/reference.md
 Auto-merging package.json
 Auto-merging plugins/pstack/.claude-plugin/plugin.json
 Auto-merging plugins/pstack/.codex-plugin/plugin.json
 Auto-merging plugins/pstack/.muse-plugin/plugin.json
-Auto-merging plugins/pstack/skills/poteto-mode/SKILL.md
-Auto-merging plugins/pstack/skills/poteto-mode/references/codex-tools.md
 Auto-merging tools/forks.json
-Automatic merge failed; fix conflicts and then commit the result.
-fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json, plugins/pstack/skills/poteto-mode/SKILL.md
+Merge made by the 'ort' strategy.
+ .claude-plugin/marketplace.json                    |   2 +-
+ .github/ISSUE_TEMPLATE/bug_report.yml              |   9 ++
+ CHANGES.md                                         |  14 +++
+ VERSION                                            |   2 +-
+ docs/reference.md                                  |   2 +-
+ kimi.plugin.json                                   |   2 +-
+ package.json                                       |   4 +-
+ plugins/pstack/.antigravity-plugin/plugin.json     |   2 +-
+ plugins/pstack/.claude-plugin/plugin.json          |   4 +-
+ plugins/pstack/.codex-plugin/plugin.json           |   4 +-
+ plugins/pstack/.github/plugin/plugin.json          |   2 +-
+ plugins/pstack/.grok-plugin/plugin.json            |   2 +-
+ plugins/pstack/.muse-plugin/plugin.json            |   2 +-
+ plugins/pstack/hooks/session-start.sh              |   4 +
+ plugins/pstack/package.json                        |   2 +-
+ .../skills/poteto-mode/scripts/check-playbooks.mjs |  12 ++-
+ .../poteto-mode/scripts/watch-pr/check-suites.ts   |  49 +++++++++
+ .../scripts/watch-pr/fakes.test-helper.ts          |   3 +-
+ .../scripts/watch-pr/github.port.test.ts           |  65 ++++++++++++
+ .../skills/poteto-mode/scripts/watch-pr/github.ts  | 118 +++++++++------------
+ .../poteto-mode/scripts/watch-pr/head-checks.ts    |  26 +++++
+ .../scripts/watch-pr/policy.port.test.ts           |  25 +++++
+ .../skills/poteto-mode/scripts/watch-pr/policy.ts  |  29 +----
+ .../skills/poteto-mode/scripts/watch-pr/render.ts  |   4 +-
+ .../poteto-mode/scripts/watch-pr/transport.test.ts |  24 +++++
+ .../skills/poteto-mode/scripts/watch-pr/types.ts   |  11 +-
+ tests/check-playbooks.test.mjs                     |  35 ++++++
+ tests/issue-template.test.mjs                      |  20 ++++
+ tests/session-hook.test.mjs                        |  90 ++++++++++++++++
+ tools/forks.json                                   |  10 +-
+ 30 files changed, 459 insertions(+), 119 deletions(-)
+ create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/check-suites.ts
+ create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/head-checks.ts
+ create mode 100644 tests/issue-template.test.mjs
+fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [129.00ms]
+1 package installed [119.00ms]
 ok: 55 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: 55 generated files current
