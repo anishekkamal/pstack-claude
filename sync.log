@@ -1,17 +1,20 @@
-upstream moved: 4 commit(s), ..1cadabb
+upstream moved: 7 commit(s), ..97d2ba2
 Auto-merging .claude-plugin/marketplace.json
+Auto-merging README.md
 Auto-merging docs/reference.md
 Auto-merging package.json
 Auto-merging plugins/pstack/.claude-plugin/plugin.json
 Auto-merging plugins/pstack/.codex-plugin/plugin.json
 Auto-merging plugins/pstack/.muse-plugin/plugin.json
+Auto-merging plugins/pstack/skills/poteto-mode/SKILL.md
 Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
  .claude-plugin/marketplace.json                    |   2 +-
- .github/ISSUE_TEMPLATE/bug_report.yml              |   9 ++
- CHANGES.md                                         |  14 +++
+ .github/ISSUE_TEMPLATE/bug_report.yml              |   1 +
+ CHANGES.md                                         |  28 +++++
+ README.md                                          |  12 +-
  VERSION                                            |   2 +-
- docs/reference.md                                  |   2 +-
+ docs/reference.md                                  |   9 +-
  kimi.plugin.json                                   |   2 +-
  package.json                                       |   4 +-
  plugins/pstack/.antigravity-plugin/plugin.json     |   2 +-
@@ -20,36 +23,64 @@ Merge made by the 'ort' strategy.
  plugins/pstack/.github/plugin/plugin.json          |   2 +-
  plugins/pstack/.grok-plugin/plugin.json            |   2 +-
  plugins/pstack/.muse-plugin/plugin.json            |   2 +-
- plugins/pstack/hooks/session-start.sh              |   4 +
+ plugins/pstack/hooks/session-start.ps1             |   2 +-
+ plugins/pstack/hooks/session-start.sh              |   4 +-
  plugins/pstack/package.json                        |   2 +-
- .../skills/poteto-mode/scripts/check-playbooks.mjs |  12 ++-
- .../poteto-mode/scripts/watch-pr/check-suites.ts   |  49 +++++++++
- .../scripts/watch-pr/fakes.test-helper.ts          |   3 +-
- .../scripts/watch-pr/github.port.test.ts           |  65 ++++++++++++
- .../skills/poteto-mode/scripts/watch-pr/github.ts  | 118 +++++++++------------
- .../poteto-mode/scripts/watch-pr/head-checks.ts    |  26 +++++
- .../scripts/watch-pr/policy.port.test.ts           |  25 +++++
- .../skills/poteto-mode/scripts/watch-pr/policy.ts  |  29 +----
- .../skills/poteto-mode/scripts/watch-pr/render.ts  |   4 +-
- .../poteto-mode/scripts/watch-pr/transport.test.ts |  24 +++++
- .../skills/poteto-mode/scripts/watch-pr/types.ts   |  11 +-
- tests/check-playbooks.test.mjs                     |  35 ++++++
- tests/issue-template.test.mjs                      |  20 ++++
- tests/session-hook.test.mjs                        |  90 ++++++++++++++++
- tools/forks.json                                   |  10 +-
- 30 files changed, 459 insertions(+), 119 deletions(-)
- create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/check-suites.ts
- create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/head-checks.ts
- create mode 100644 tests/issue-template.test.mjs
+ plugins/pstack/skills/poteto-help/SKILL.md         |   2 +-
+ plugins/pstack/skills/poteto-mode/SKILL.md         |   2 +-
+ .../skills/poteto-mode/references/dsh-tools.md     |  51 +++++++++
+ .../skills/poteto-mode/references/omp-tools.md     |   1 +
+ .../poteto-mode/scripts/watch-pr/check-suites.ts   |  14 ++-
+ .../poteto-mode/scripts/watch-pr/cli.port.test.ts  |  88 +++++++++++++++
+ .../skills/poteto-mode/scripts/watch-pr/cli.ts     |  17 +++
+ .../scripts/watch-pr/fakes.test-helper.ts          |   2 +-
+ .../scripts/watch-pr/github.port.test.ts           |  96 +++++++++-------
+ .../skills/poteto-mode/scripts/watch-pr/github.ts  |  42 +++++--
+ .../poteto-mode/scripts/watch-pr/head-checks.ts    |  29 +++--
+ .../scripts/watch-pr/policy.port.test.ts           | 124 +++++++++++++++++++++
+ .../skills/poteto-mode/scripts/watch-pr/policy.ts  |  16 ++-
+ .../skills/poteto-mode/scripts/watch-pr/render.ts  |  13 ++-
+ .../poteto-mode/scripts/watch-pr/transport.test.ts |  41 ++++++-
+ .../poteto-mode/scripts/watch-pr/types.compile.ts  |   1 +
+ .../skills/poteto-mode/scripts/watch-pr/types.ts   |  24 +++-
+ plugins/pstack/skills/reflect/SKILL.md             |   2 +-
+ plugins/pstack/skills/setup-pstack/SKILL.md        |   6 +-
+ .../skills/setup-pstack/references/runtimes.md     |   1 +
+ plugins/pstack/skills/statechart/SKILL.md          |   2 +-
+ .../skills/statechart/scripts/frontends/dot.ts     |   5 +-
+ .../pstack/skills/statechart/scripts/janitor.ts    |  17 +--
+ plugins/pstack/skills/statechart/scripts/kill.ts   |  15 +++
+ plugins/pstack/skills/statechart/scripts/run.ts    |  24 ++--
+ .../pstack/skills/statechart/scripts/statechart.ts |  35 +++---
+ .../skills/statechart/scripts/test/cli.test.ts     |  29 +++++
+ .../statechart/scripts/test/messages.test.ts       |  23 ++--
+ tests/dsh.test.mjs                                 |  48 ++++++++
+ tests/generate.test.mjs                            |  26 ++++-
+ tests/omp.test.mjs                                 |   9 +-
+ tests/session-hook-sheets.mjs                      |  12 ++
+ tests/session-hook-windows.test.mjs                |  26 ++++-
+ tests/session-hook.test.mjs                        |  21 +++-
+ tests/statechart-windows-hide.test.mjs             |  13 +++
+ tools/forks.json                                   |  36 +++---
+ tools/generate.mjs                                 |   6 +-
+ tools/runtimes.mjs                                 |  26 ++++-
+ tools/substitutions.json                           |   4 +-
+ tools/upstream.json                                |   2 +-
+ 57 files changed, 840 insertions(+), 195 deletions(-)
+ create mode 100644 plugins/pstack/skills/poteto-mode/references/dsh-tools.md
+ create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/cli.port.test.ts
+ create mode 100644 plugins/pstack/skills/statechart/scripts/kill.ts
+ create mode 100644 tests/dsh.test.mjs
+ create mode 100644 tests/statechart-windows-hide.test.mjs
 fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [119.00ms]
-ok: 55 generated files current
+1 package installed [105.00ms]
+ok: 56 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
-ok: 55 generated files current
+ok: 56 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: local markdown links stay inside plugins/pstack/skills
 ok: no prose in plugins/pstack/skills points at a path outside it
