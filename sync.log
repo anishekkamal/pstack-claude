@@ -1,111 +1,17 @@
-upstream moved: 26 commit(s), ..66181d3
-Auto-merging .claude-plugin/marketplace.json
-Auto-merging .github/workflows/ci.yml
-Auto-merging .gitignore
-Auto-merging README.md
-Auto-merging docs/reference.md
-Auto-merging package.json
-Auto-merging plugins/pstack/.claude-plugin/plugin.json
-Auto-merging plugins/pstack/.codex-plugin/plugin.json
-Auto-merging plugins/pstack/.muse-plugin/plugin.json
-Auto-merging plugins/pstack/skills/poteto-mode/SKILL.md
-Auto-merging plugins/pstack/skills/poteto-mode/references/codex-tools.md
-Auto-merging tools/forks.json
+upstream moved: 2 commit(s), ..595c0ca
 Merge made by the 'ort' strategy.
- .claude-plugin/marketplace.json                    |   2 +-
- .github/workflows/ci.yml                           |  16 +
- .github/workflows/release-npm.yml                  |  77 +++
- .gitignore                                         |   8 +
- CHANGES.md                                         |  44 ++
- CONTRIBUTING.md                                    |   2 +
- README.md                                          |  62 ++-
- VERSION                                            |   2 +-
- assets/pstack-overview.png                         | Bin 1290288 -> 1444601 bytes
- assets/pstack-overview.prompt.txt                  |  34 +-
- docs/pi-equivalence.md                             |   3 +-
- docs/reference.md                                  |  21 +-
- installer/bin/open-pstack.mjs                      |   4 +
- installer/lib/bundle.mjs                           |  42 ++
- installer/lib/cli.mjs                              | 211 +++++++
- installer/lib/detect.mjs                           |  28 +
- installer/lib/harnesses.mjs                        | 136 +++++
- installer/lib/steps.mjs                            | 102 ++++
- installer/package.json                             |  32 ++
- installer/scripts/stage.mjs                        |  27 +
- kimi.plugin.json                                   |   2 +-
- package.json                                       |   4 +-
- plugins/pstack/.antigravity-plugin/plugin.json     |   2 +-
- plugins/pstack/.claude-plugin/plugin.json          |   4 +-
- plugins/pstack/.codex-plugin/plugin.json           |   4 +-
- plugins/pstack/.github/plugin/plugin.json          |   2 +-
- plugins/pstack/.grok-plugin/plugin.json            |   2 +-
- plugins/pstack/.muse-plugin/plugin.json            |   2 +-
- plugins/pstack/opencode/index.js                   |  42 +-
- plugins/pstack/package.json                        |   2 +-
- plugins/pstack/pi/agents.ts                        |  51 +-
- plugins/pstack/pi/child.ts                         |   5 +-
- plugins/pstack/pi/config.ts                        |  32 +-
- plugins/pstack/pi/hc-child.ts                      | 210 +++++++
- plugins/pstack/pi/index.ts                         |   3 +-
- plugins/pstack/pi/prompt.ts                        |   4 +-
- plugins/pstack/skills/fix-ci/SKILL.md              |   1 +
- plugins/pstack/skills/poteto-mode/SKILL.md         |   2 +-
- .../pstack/skills/poteto-mode/playbooks/babysit.md |   4 +-
- .../skills/poteto-mode/playbooks/shipping.md       |   2 +
- .../references/cloud-session-pr-reads.md           |  38 ++
- .../skills/poteto-mode/references/codex-tools.md   |   2 +-
- .../poteto-mode/references/opencode-tools.md       |   3 +-
- .../skills/poteto-mode/references/pi-tools.md      |   7 +-
- .../poteto-mode/scripts/watch-pr/check-suites.ts   | 150 ++++-
- .../skills/poteto-mode/scripts/watch-pr/cli.ts     |   4 +-
- .../scripts/watch-pr/cloud-reader.test.ts          | 264 +++++++++
- .../poteto-mode/scripts/watch-pr/cloud-reader.ts   | 613 +++++++++++++++++++++
- .../scripts/watch-pr/github.port.test.ts           | 470 ++++++++++++++++
- .../skills/poteto-mode/scripts/watch-pr/github.ts  | 103 ++--
- .../skills/poteto-mode/scripts/watch-pr/landing.ts |   2 +-
- .../poteto-mode/scripts/watch-pr/query-error.ts    |  40 ++
- .../poteto-mode/scripts/watch-pr/transport.test.ts | 268 +++++++--
- .../poteto-mode/scripts/watch-pr/workflow-runs.ts  | 217 ++++++++
- plugins/pstack/skills/setup-pstack/SKILL.md        |   8 +-
- .../skills/setup-pstack/references/runtimes.md     |   3 +-
- tests/generate.test.mjs                            |  20 +
- tests/installer.test.mjs                           | 358 ++++++++++++
- tests/opencode.test.mjs                            |  53 +-
- tests/pi-equivalence.test.mjs                      |   2 +-
- tests/pi/agents-launch.test.mjs                    |  32 ++
- tests/pi/agents-session.test.mjs                   |  20 +
- tests/pi/config.test.mjs                           |  83 ++-
- tests/pi/hc-child.test.mjs                         | 222 ++++++++
- tests/pi/live-harness.mjs                          |  18 +-
- tests/pi/live.test.mjs                             |  13 +-
- tests/reflect-destinations.test.mjs                |  44 ++
- tools/forks.json                                   |  16 +-
- tools/generate.mjs                                 |   5 +-
- 69 files changed, 4108 insertions(+), 203 deletions(-)
- create mode 100644 .github/workflows/release-npm.yml
- create mode 100755 installer/bin/open-pstack.mjs
- create mode 100644 installer/lib/bundle.mjs
- create mode 100644 installer/lib/cli.mjs
- create mode 100644 installer/lib/detect.mjs
- create mode 100644 installer/lib/harnesses.mjs
- create mode 100644 installer/lib/steps.mjs
- create mode 100644 installer/package.json
- create mode 100644 installer/scripts/stage.mjs
- create mode 100644 plugins/pstack/pi/hc-child.ts
- create mode 100644 plugins/pstack/skills/poteto-mode/references/cloud-session-pr-reads.md
- create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/cloud-reader.test.ts
- create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/cloud-reader.ts
- create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/query-error.ts
- create mode 100644 plugins/pstack/skills/poteto-mode/scripts/watch-pr/workflow-runs.ts
- create mode 100644 tests/installer.test.mjs
- create mode 100644 tests/pi/hc-child.test.mjs
- create mode 100644 tests/reflect-destinations.test.mjs
-fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
+ .github/workflows/dependency-review.yml | 22 +++++++++++++++++
+ .github/workflows/scorecard.yml         | 44 +++++++++++++++++++++++++++++++++
+ tests/pi-package.test.mjs               |  2 +-
+ 3 files changed, 67 insertions(+), 1 deletion(-)
+ create mode 100644 .github/workflows/dependency-review.yml
+ create mode 100644 .github/workflows/scorecard.yml
+fork overlay: nothing to change
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [122.00ms]
+1 package installed [52.00ms]
 ok: 57 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: 57 generated files current
