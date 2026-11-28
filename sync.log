@@ -1,71 +1,39 @@
-upstream moved: 10 commit(s), ..1ab6b82
+upstream moved: 4 commit(s), ..b15f9d8
 Auto-merging .claude-plugin/marketplace.json
-Auto-merging docs/reference.md
 Auto-merging package.json
 Auto-merging plugins/pstack/.claude-plugin/plugin.json
 Auto-merging plugins/pstack/.codex-plugin/plugin.json
 Auto-merging plugins/pstack/.muse-plugin/plugin.json
-Auto-merging plugins/pstack/skills/poteto-mode/SKILL.md
-Auto-merging plugins/pstack/skills/poteto-mode/references/codex-tools.md
-Auto-merging tools/forks.json
 Merge made by the 'ort' strategy.
- .claude-plugin/marketplace.json                    |   2 +-
- .github/workflows/gitleaks.yml                     |  49 ++
- .pre-commit-config.yaml                            |   4 +
- CHANGES.md                                         |  18 +
- VERSION                                            |   2 +-
- docs/pi-equivalence.md                             |   2 +-
- docs/reference.md                                  |  12 +-
- installer/package.json                             |   2 +-
- kimi.plugin.json                                   |   2 +-
- package.json                                       |   4 +-
- plugins/pstack/.antigravity-plugin/plugin.json     |   2 +-
- plugins/pstack/.claude-plugin/plugin.json          |   4 +-
- plugins/pstack/.codex-plugin/plugin.json           |   4 +-
- plugins/pstack/.github/plugin/plugin.json          |   2 +-
- plugins/pstack/.grok-plugin/plugin.json            |   2 +-
- plugins/pstack/.muse-plugin/plugin.json            |   2 +-
- plugins/pstack/package.json                        |   2 +-
- plugins/pstack/pi/agents.ts                        | 114 +++--
- plugins/pstack/pi/child.ts                         |   7 +
- plugins/pstack/pi/config.ts                        |   2 +
- plugins/pstack/pi/hc-child.ts                      |  17 +-
- plugins/pstack/pi/t3-child.ts                      | 254 ++++++++++
- plugins/pstack/skills/arena/SKILL.md               |   2 +-
- plugins/pstack/skills/interrogate/SKILL.md         |   2 +-
- plugins/pstack/skills/no-comments/SKILL.md         |   2 +-
- plugins/pstack/skills/poteto-mode/SKILL.md         |   2 +-
- .../skills/poteto-mode/references/codex-tools.md   |  39 +-
- .../skills/poteto-mode/references/pi-tools.md      |   5 +-
- .../poteto-mode/scripts/watch-pr/cli.port.test.ts  |  71 +++
- .../scripts/watch-pr/policy.port.test.ts           |  68 ++-
- .../skills/poteto-mode/scripts/watch-pr/policy.ts  |  33 +-
- .../skills/poteto-mode/scripts/watch-pr/types.ts   |   2 +-
- plugins/pstack/skills/swarm/SKILL.md               |   2 +-
- plugins/pstack/skills/thermos/SKILL.md             |   2 +-
- tests/agent-skills.test.mjs                        |  10 +
- tests/generate.test.mjs                            |   5 +
- tests/pi/agents-launch.test.mjs                    |  33 +-
- tests/pi/agents-session.test.mjs                   |  55 ++-
- tests/pi/config.test.mjs                           |   9 +-
- tests/pi/fake-pi.mjs                               |   1 +
- tests/pi/harness.mjs                               |  14 +
- tests/pi/hc-child.test.mjs                         |   2 +-
- tests/pi/t3-child.test.mjs                         | 531 +++++++++++++++++++++
- tests/skill-rules.test.mjs                         |  35 ++
- tools/forks.json                                   |   2 +-
- tools/generate.mjs                                 |   1 +
- tools/runtimes.mjs                                 |   4 +-
- 47 files changed, 1348 insertions(+), 93 deletions(-)
- create mode 100644 .github/workflows/gitleaks.yml
- create mode 100644 plugins/pstack/pi/t3-child.ts
- create mode 100644 tests/pi/t3-child.test.mjs
+ .claude-plugin/marketplace.json                    |  2 +-
+ CHANGES.md                                         |  8 +++++++
+ VERSION                                            |  2 +-
+ installer/package.json                             |  2 +-
+ kimi.plugin.json                                   |  2 +-
+ package.json                                       |  4 ++--
+ plugins/pstack/.antigravity-plugin/plugin.json     |  2 +-
+ plugins/pstack/.claude-plugin/plugin.json          |  4 ++--
+ plugins/pstack/.codex-plugin/plugin.json           |  4 ++--
+ plugins/pstack/.github/plugin/plugin.json          |  2 +-
+ plugins/pstack/.grok-plugin/plugin.json            |  2 +-
+ plugins/pstack/.muse-plugin/plugin.json            |  2 +-
+ plugins/pstack/omp/index.mjs                       |  5 ++---
+ plugins/pstack/package.json                        |  2 +-
+ plugins/pstack/pi/config.ts                        | 25 ++++++++++++++++------
+ plugins/pstack/pi/hc-child.ts                      | 15 ++++++++-----
+ .../skills/poteto-mode/references/agy-tools.md     |  2 +-
+ .../skills/poteto-mode/references/omp-tools.md     | 10 ++++++---
+ tests/agy.test.mjs                                 | 10 +++++++++
+ tests/omp.test.mjs                                 | 20 +++++++++++++----
+ tests/pi/config.test.mjs                           | 10 ++++++++-
+ tests/pi/hc-child.test.mjs                         |  8 ++++++-
+ 22 files changed, 103 insertions(+), 40 deletions(-)
 fork overlay: updated plugins/pstack/.claude-plugin/plugin.json, plugins/pstack/.codex-plugin/plugin.json, package.json
 bun install v1.3.14 (0d9b296a)
 
 + typebox@1.3.34
 
-1 package installed [83.00ms]
+1 package installed [107.00ms]
 ok: 82 generated files current
 ok: skill links, prose paths, model slugs, runtime packaging, plugin layout, agent frontmatter, and hooks pass their checks
 ok: 82 generated files current
